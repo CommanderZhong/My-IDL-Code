@@ -44,30 +44,34 @@ pro gcs_try,date=date,head,tail
 ;;       tail:the end number of file
 ;;Example:
 ;;	 gcs_try,date='120623',20,28
-;;Editor:
+;;Log:
 ;;      Z.H.Zhong at 02/26/2019
+;
 
+;find fits file
+patha='/home/zhzhong/Desktop/mywork/data/'+date+'/STA'
+pathb='/home/zhzhong/Desktop/mywork/data/'+date+'/STB'
+pathl='/home/zhzhong/Desktop/mywork/data/'+date+'/LC2'
+filea=findfile(patha+'/*fts')
+fileb=findfile(pathb+'/*fts')
+filel=findfile(pathl+'/*fts')
 
-    patha='/home/zhzhong/Desktop/mywork/data/'+date+'/STA'
-    pathb='/home/zhzhong/Desktop/mywork/data/'+date+'/STB'
-    pathl='/home/zhzhong/Desktop/mywork/data/'+date+'/LC2'
-    filea=findfile(patha+'/*fts')
-    fileb=findfile(pathb+'/*fts')
-    filel=findfile(pathl+'/*fts')
-    ;k=41
-    ;secchi_prep,filea[k],bindexa,bdataa,/silent,/smask_on,/rotate_on,/calfac_off,/calimg_off
-    ;secchi_prep,fileb[k],bindexb,bdatab,/silent,/smask_on,/rotate_on,/calfac_off,/calimg_off
-    ;bdatal=lasco_readfits(filel[k],bindexl)
-    for i=head+1,tail do begin             
-        secchi_prep,filea[i],indexa,dataa,/silent,/smask_on,/rotate_on,/calfac_off,/calimg_off
-        secchi_prep,fileb[i],indexb,datab,/silent,/smask_on,/rotate_on,/calfac_off,/calimg_off
-        datal=lasco_readfits(filel[i],indexl)
+;do cycle to read fits file
+;
+;k=41
+;secchi_prep,filea[k],bindexa,bdataa,/silent,/smask_on,/rotate_on,/calfac_off,/calimg_off
+;secchi_prep,fileb[k],bindexb,bdatab,/silent,/smask_on,/rotate_on,/calfac_off,/calimg_off
+;bdatal=lasco_readfits(filel[k],bindexl)
+for i=head+1,tail do begin             
+  secchi_prep,filea[i],indexa,dataa,/silent,/smask_on,/rotate_on,/calfac_off,/calimg_off
+  secchi_prep,fileb[i],indexb,datab,/silent,/smask_on,/rotate_on,/calfac_off,/calimg_off
+  datal=lasco_readfits(filel[i],indexl)
 	tempa=dataa
 	tempb=datab
 	templ=datal  
 	;running difference      
 	if i-head eq 1 then begin
-	secchi_prep,filea[i-1],bindexa,bdataa,/silent,/smask_on,/rotate_on,/calfac_off,/calimg_off
+	      secchi_prep,filea[i-1],bindexa,bdataa,/silent,/smask_on,/rotate_on,/calfac_off,/calimg_off
         secchi_prep,fileb[i-1],bindexb,bdatab,/silent,/smask_on,/rotate_on,/calfac_off,/calimg_off
         bdatal=lasco_readfits(filel[i-1],bindexl)
 	endif
@@ -77,18 +81,23 @@ pro gcs_try,date=date,head,tail
 	bdataa=tempa
 	bdatab=tempb
 	bdatal=templ
-
-        imagea=congrid(bytscl(median(smooth(dataa,5),5),-5,5),512,512)       ;running difference -2-2
-        imageb=congrid(bytscl(median(smooth(datab,5),5),-5,5),512,512)
-        imagel=congrid(bytscl(median(smooth(datal,3),3),-100,100),512,512)      ;running difference -30-30
+	
+	;do data procession
+  imagea=congrid(bytscl(median(smooth(dataa,5),5),-5,5),512,512)       ;running difference -2-2
+  imageb=congrid(bytscl(median(smooth(datab,5),5),-5,5),512,512)
+  imagel=congrid(bytscl(median(smooth(datal,3),3),-100,100),512,512)      ;running difference -30-30
+        
 	;use gcs model
-        rtsccguicloud,imagea,imageb,indexa,indexb,imlasco=imagel,hdrlasco=indexl,sgui=sguiout
+  rtsccguicloud,imagea,imageb,indexa,indexb,imlasco=imagel,hdrlasco=indexl,sgui=sguiout
+        
 	;save sav data file
 	savfile='/home/zhzhong/Desktop/mywork/work/savdata/'+date+'/'
 	spawn,'mkdir -p '+savfile
 	name=savfile+'/sguiout'+string(i-head,format='(I2.2)')+'.sav'
 	SAVE,sguiout,FILENAME=name
-    endfor
-    sav_read,date=date
+endfor
+
+   ;call for procedure sav_read 
+   sav_read,date=date
 end
 
