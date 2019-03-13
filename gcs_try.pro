@@ -43,7 +43,7 @@ pro gcs_try,date=date,head,tail
 ;;       head:the start number of file
 ;;       tail:the end number of file
 ;;Example:
-;;	 gcs_try,date='120623',20,28
+;;	 gcs_try,date='120623',20,28 ;for runnig difference
 ;;Log:
 ;;      Z.H.Zhong at 02/26/2019
 ;
@@ -65,28 +65,36 @@ filel=findfile(pathl+'/*fts')
 for i=head+1,tail do begin             
   secchi_prep,filea[i],indexa,dataa,/silent,/smask_on,/rotate_on,/calfac_off,/calimg_off
   secchi_prep,fileb[i],indexb,datab,/silent,/smask_on,/rotate_on,/calfac_off,/calimg_off
+;  dataa=sccreadfits(filea[i],indexa)
+;  datab=sccreadfits(fileb[i],indexb)
   datal=lasco_readfits(filel[i],indexl)
-	tempa=dataa
-	tempb=datab
-	templ=datal  
-	;running difference      
-	if i-head eq 1 then begin
-	      secchi_prep,filea[i-1],bindexa,bdataa,/silent,/smask_on,/rotate_on,/calfac_off,/calimg_off
-        secchi_prep,fileb[i-1],bindexb,bdatab,/silent,/smask_on,/rotate_on,/calfac_off,/calimg_off
-        bdatal=lasco_readfits(filel[i-1],bindexl)
-	endif
-	dataa=dataa-bdataa
-	datab=datab-bdatab
-	datal=datal-bdatal
-	bdataa=tempa
-	bdatab=tempb
-	bdatal=templ
+;  pmm,dataa
+;  pmm,datal
+;	tempa=dataa
+;	tempb=datab
+;	templ=datal  
+;	;running difference      
+;	if i-head eq 1 then begin
+;	      secchi_prep,filea[i-1],bindexa,bdataa,/silent,/smask_on,/rotate_on,/calfac_off,/calimg_off
+;        secchi_prep,fileb[i-1],bindexb,bdatab,/silent,/smask_on,/rotate_on,/calfac_off,/calimg_off
+;        bdatal=lasco_readfits(filel[i-1],bindexl)
+;	endif
+;	dataa=dataa-bdataa
+;	datab=datab-bdatab
+;	datal=datal-bdatal
+;	bdataa=tempa
+;	bdatab=tempb
+;	bdatal=templ
 	
 	;do data procession
-  imagea=congrid(bytscl(median(smooth(dataa,5),5),-5,5),512,512)       ;running difference -2-2
-  imageb=congrid(bytscl(median(smooth(datab,5),5),-5,5),512,512)
-  imagel=congrid(bytscl(median(smooth(datal,3),3),-100,100),512,512)      ;running difference -30-30
-        
+;  imagea=congrid(bytscl(median(smooth(dataa,5),5),-5,5),512,512)       ;running difference -2-2
+;  imageb=congrid(bytscl(median(smooth(datab,5),5),-5,5),512,512)
+;  imagel=congrid(bytscl(median(smooth(datal,3),3),-100,100),512,512)      ;running difference -30-30
+
+   imagea=congrid(bytscl(dataa,0,600),512,512)
+   imageb=congrid(bytscl(datab,0,600),512,512)
+   imagel=congrid(bytscl(datal,1000,4500),512,512)
+
 	;use gcs model
   rtsccguicloud,imagea,imageb,indexa,indexb,imlasco=imagel,hdrlasco=indexl,sgui=sguiout
         
