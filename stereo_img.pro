@@ -9,8 +9,6 @@ pro stereo_img,date=date,sat=sat,instr=instr
 ;;
 ;-
    
-
-
     path='/home/zhzhong/Desktop/mywork/data/'+date+'/'+sat+'/'
     file=findfile(path+'*fts')
     if sat eq 'STA' then begin

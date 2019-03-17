@@ -1,8 +1,9 @@
-;To rename lasco fts file which just download from internet
-;example:
-;        lasco_rename,date='120704'
-
 pro lasco_rename,date=date
+
+  ;To rename lasco fts file which just download from internet
+  ;example:
+  ;        lasco_rename,date='120704'
+
     path='/home/zhzhong/Desktop/mywork/data/'+date+'/LC2'
     cd,path
     file=findfile('./*fts')
