@@ -14,3 +14,15 @@ pro lasco_rename,date=date
     endfor
     cd,'/home/zhzhong/Desktop/mywork/work/code'
 end
+
+
+pro use_lasco_rename
+
+;To use procedure lasco_rename. Before run this code, you need to list the date at datelist as follow:
+;datelist=['100206','100208','100210','100213']
+
+datelist=['100206','100208','100210','100213']
+for i=0,n_elements(datelist)-1 do begin
+  lasco_rename,date=datelist[i]
+endfor
+end
