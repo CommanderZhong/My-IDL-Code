@@ -45,8 +45,8 @@ pro gcs_try,date=date,head,tail
 ;;Example:
 ;;	 gcs_try,date='120623',20,28 ;for runnig difference
 ;;Log:
-;;      Z.H.Zhong at 02/26/2019
-;
+;;v1.0   init   Z.H.Zhong at 02/26/2019
+;;v1.1   use base difference      Z.H.Zhong at 03/17/2019
 
 ;find fits file
 patha='/home/zhzhong/Desktop/mywork/data/'+date+'/STA'
@@ -58,10 +58,10 @@ filel=findfile(pathl+'/*fts')
 
 ;do cycle to read fits file
 ;
-;k=41
-;secchi_prep,filea[k],bindexa,bdataa,/silent,/smask_on,/rotate_on,/calfac_off,/calimg_off
-;secchi_prep,fileb[k],bindexb,bdatab,/silent,/smask_on,/rotate_on,/calfac_off,/calimg_off
-;bdatal=lasco_readfits(filel[k],bindexl)
+k=head-1
+secchi_prep,filea[k],bindexa,bdataa,/silent,/smask_on,/rotate_on,/calfac_off,/calimg_off
+secchi_prep,fileb[k],bindexb,bdatab,/silent,/smask_on,/rotate_on,/calfac_off,/calimg_off
+bdatal=lasco_readfits(filel[k],bindexl)
 for i=head+1,tail do begin             
   secchi_prep,filea[i],indexa,dataa,/silent,/smask_on,/rotate_on,/calfac_off,/calimg_off
   secchi_prep,fileb[i],indexb,datab,/silent,/smask_on,/rotate_on,/calfac_off,/calimg_off
@@ -79,21 +79,21 @@ for i=head+1,tail do begin
 ;        secchi_prep,fileb[i-1],bindexb,bdatab,/silent,/smask_on,/rotate_on,/calfac_off,/calimg_off
 ;        bdatal=lasco_readfits(filel[i-1],bindexl)
 ;	endif
-;	dataa=dataa-bdataa
-;	datab=datab-bdatab
-;	datal=datal-bdatal
+	dataa=dataa-bdataa
+	datab=datab-bdatab
+	datal=datal-bdatal
 ;	bdataa=tempa
 ;	bdatab=tempb
 ;	bdatal=templ
 	
 	;do data procession
-;  imagea=congrid(bytscl(median(smooth(dataa,5),5),-5,5),512,512)       ;running difference -2-2
-;  imageb=congrid(bytscl(median(smooth(datab,5),5),-5,5),512,512)
-;  imagel=congrid(bytscl(median(smooth(datal,3),3),-100,100),512,512)      ;running difference -30-30
+  imagea=congrid(bytscl(median(smooth(dataa,5),5),-5,5),512,512)       ;running difference -2-2
+  imageb=congrid(bytscl(median(smooth(datab,5),5),-5,5),512,512)
+  imagel=congrid(bytscl(median(smooth(datal,3),3),-100,100),512,512)      ;running difference -30-30
 
-   imagea=congrid(bytscl(dataa,0,600),512,512)
-   imageb=congrid(bytscl(datab,0,600),512,512)
-   imagel=congrid(bytscl(datal,1000,4500),512,512)
+;   imagea=congrid(bytscl(dataa,0,600),512,512)
+;   imageb=congrid(bytscl(datab,0,600),512,512)
+;   imagel=congrid(bytscl(datal,1000,4500),512,512)
 
 	;use gcs model
   rtsccguicloud,imagea,imageb,indexa,indexb,imlasco=imagel,hdrlasco=indexl,sgui=sguiout
