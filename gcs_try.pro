@@ -44,7 +44,7 @@ pro gcs_try,date=date,nolasco=nolasco,head,tail
 ;;       head:the start number of file
 ;;       tail:the end number of file
 ;;Example:
-;;	 gcs_try,date='120623',/nolasco,20,28 ;for runnig difference
+;;	 gcs_try,date='120623',/nolasco,20,28 ;for nolasco
 ;;Log:
 ;;v1.0   init   Z.H.Zhong at 02/26/2019
 ;;v1.1   use base difference      Z.H.Zhong at 03/17/2019
@@ -53,7 +53,7 @@ pro gcs_try,date=date,nolasco=nolasco,head,tail
 if not keyword_set(nolasco) then nolasco=2 
 
 ;set base 
-k=head-1
+k=head-2
 ;find fits file
 patha='/home/zhzhong/Desktop/mywork/data/'+date+'/STA'
 pathb='/home/zhzhong/Desktop/mywork/data/'+date+'/STB'
@@ -69,7 +69,7 @@ if nolasco ne 1 then begin
 endif
 
 ;do cycle to read fits file
-for i=head+1,tail do begin             
+for i=head,tail do begin             
   secchi_prep,filea[i],indexa,dataa,/silent,/smask_on,/rotate_on,/calfac_off,/calimg_off
   secchi_prep,fileb[i],indexb,datab,/silent,/smask_on,/rotate_on,/calfac_off,/calimg_off
 ;do diff
@@ -81,7 +81,7 @@ for i=head+1,tail do begin
   if nolasco ne 1 then begin
     datal=lasco_readfits(filel[i],indexl)
     datal=datal-bdatal
-    imagel=congrid(bytscl(median(smooth(datal,3),3),-100,100),512,512)      ;running difference -30-30
+    imagel=congrid(bytscl(median(smooth(datal,3),3),-80,80),512,512)      ;running difference -30-30
   endif
 	
 ;use gcs model
