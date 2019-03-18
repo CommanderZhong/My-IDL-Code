@@ -34,69 +34,62 @@ endfor
 free_lun,lun
 end
 
-pro gcs_try,date=date,head,tail
+pro gcs_try,date=date,nolasco=nolasco,head,tail
 
 ;;Purpose:   To use gcs model 
-;;Use:   gcs_try,date=date,head,tail
+;;Use:   gcs_try,date=date,head,tail[,/nolasco]
 ;;Keywords:
 ;;       date:string,the date to use gcs model
+;;       nolasco:set /nolasco if there is no lasco data
 ;;       head:the start number of file
 ;;       tail:the end number of file
 ;;Example:
-;;	 gcs_try,date='120623',20,28 ;for runnig difference
+;;	 gcs_try,date='120623',/nolasco,20,28 ;for runnig difference
 ;;Log:
 ;;v1.0   init   Z.H.Zhong at 02/26/2019
 ;;v1.1   use base difference      Z.H.Zhong at 03/17/2019
+;;v1.2   add nolasco mode         Z.H.Zhong at 03/18/2019
 
+if not keyword_set(nolasco) then nolasco=2 
+
+;set base 
+k=head-1
 ;find fits file
 patha='/home/zhzhong/Desktop/mywork/data/'+date+'/STA'
 pathb='/home/zhzhong/Desktop/mywork/data/'+date+'/STB'
-pathl='/home/zhzhong/Desktop/mywork/data/'+date+'/LC2'
 filea=findfile(patha+'/*fts')
 fileb=findfile(pathb+'/*fts')
-filel=findfile(pathl+'/*fts')
-
-;do cycle to read fits file
-;
-k=head-1
+;read base fits file
 secchi_prep,filea[k],bindexa,bdataa,/silent,/smask_on,/rotate_on,/calfac_off,/calimg_off
 secchi_prep,fileb[k],bindexb,bdatab,/silent,/smask_on,/rotate_on,/calfac_off,/calimg_off
-bdatal=lasco_readfits(filel[k],bindexl)
+if nolasco ne 1 then begin
+  pathl='/home/zhzhong/Desktop/mywork/data/'+date+'/LC2'
+  filel=findfile(pathl+'/*fts')
+  bdatal=lasco_readfits(filel[k],bindexl)
+endif
+
+;do cycle to read fits file
 for i=head+1,tail do begin             
   secchi_prep,filea[i],indexa,dataa,/silent,/smask_on,/rotate_on,/calfac_off,/calimg_off
   secchi_prep,fileb[i],indexb,datab,/silent,/smask_on,/rotate_on,/calfac_off,/calimg_off
-;  dataa=sccreadfits(filea[i],indexa)
-;  datab=sccreadfits(fileb[i],indexb)
-  datal=lasco_readfits(filel[i],indexl)
-;  pmm,dataa
-;  pmm,datal
-;	tempa=dataa
-;	tempb=datab
-;	templ=datal  
-;	;running difference      
-;	if i-head eq 1 then begin
-;	      secchi_prep,filea[i-1],bindexa,bdataa,/silent,/smask_on,/rotate_on,/calfac_off,/calimg_off
-;        secchi_prep,fileb[i-1],bindexb,bdatab,/silent,/smask_on,/rotate_on,/calfac_off,/calimg_off
-;        bdatal=lasco_readfits(filel[i-1],bindexl)
-;	endif
-	dataa=dataa-bdataa
-	datab=datab-bdatab
-	datal=datal-bdatal
-;	bdataa=tempa
-;	bdatab=tempb
-;	bdatal=templ
-	
-	;do data procession
+;do diff
+  dataa=dataa-bdataa
+  datab=datab-bdatab
+;do data procession
   imagea=congrid(bytscl(median(smooth(dataa,5),5),-5,5),512,512)       ;running difference -2-2
   imageb=congrid(bytscl(median(smooth(datab,5),5),-5,5),512,512)
-  imagel=congrid(bytscl(median(smooth(datal,3),3),-100,100),512,512)      ;running difference -30-30
-
-;   imagea=congrid(bytscl(dataa,0,600),512,512)
-;   imageb=congrid(bytscl(datab,0,600),512,512)
-;   imagel=congrid(bytscl(datal,1000,4500),512,512)
-
-	;use gcs model
-  rtsccguicloud,imagea,imageb,indexa,indexb,imlasco=imagel,hdrlasco=indexl,sgui=sguiout
+  if nolasco ne 1 then begin
+    datal=lasco_readfits(filel[i],indexl)
+    datal=datal-bdatal
+    imagel=congrid(bytscl(median(smooth(datal,3),3),-100,100),512,512)      ;running difference -30-30
+  endif
+	
+;use gcs model
+  if nolasco eq 1 then begin
+    rtsccguicloud,imagea,imageb,indexa,indexb,sgui=sguiout
+  endif else begin
+    rtsccguicloud,imagea,imageb,indexa,indexb,imlasco=imagel,hdrlasco=indexl,sgui=sguiout
+  endelse
         
 	;save sav data file
 	savfile='/home/zhzhong/Desktop/mywork/work/savdata/'+date+'/'
@@ -108,4 +101,3 @@ endfor
    ;call for procedure sav_read 
    sav_read,date=date
 end
-
