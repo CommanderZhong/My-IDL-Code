@@ -55,5 +55,5 @@ pro stereo_img,date=date,sat=sat,instr=instr
     endfor
 
 ;;make a movie using the picture which we drawed just now
-    spawn,'ffmpeg -start_number 1 -i '+pathn+'/%02d.png'+' '+pathn+'/'+sat+'_'+instr+'_'+date+'.mpeg'    
+    spawn,'ffmpeg -start_number 1 -y -i '+pathn+'/%02d.png'+' '+pathn+'/'+sat+'_'+instr+'_'+date+'.mpeg'    
 end
