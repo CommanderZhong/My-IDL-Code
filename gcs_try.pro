@@ -15,10 +15,10 @@ par=fltarr(n,m)
 ;;create a new txt file to save parameters' data
 openw,lun,path+'pardata'+date+'.txt',/get_lun
 title='date='+date
-subtitle='TIME              LON              LAT              ROT              HAN              HGT              RAT'
+subtitle='TIME              LON              LAT              ROT              HAN              HGT              RAT' ;blank to keep formation
 printf,lun,title
 printf,lun,subtitle
-thisFormat='(a,6(f,2x))'
+thisFormat='(a,6(f,2x),/)'
 for i=0,m-1 do begin
 restore,file(i)
 ;help,sguiout,/str
@@ -34,26 +34,30 @@ endfor
 free_lun,lun
 end
 
-pro gcs_try,date=date,nolasco=nolasco,head,tail
+pro gcs_try,date=date,base=base,nolasco=nolasco,head,tail
 
 ;;Purpose:   To use gcs model 
 ;;Use:   gcs_try,date=date,head,tail[,/nolasco]
 ;;Keywords:
 ;;       date:string,the date to use gcs model
 ;;       nolasco:set /nolasco if there is no lasco data
+;;       base:the base to diff
 ;;       head:the start number of file
 ;;       tail:the end number of file
 ;;Example:
-;;	 gcs_try,date='120623',/nolasco,20,28 ;for nolasco
+;;	 gcs_try,date='120623',base=18,/nolasco,20,28 ;for nolasco
 ;;Log:
-;;v1.0   init   Z.H.Zhong at 02/26/2019
+;;v1.0   init                     Z.H.Zhong at 02/26/2019
 ;;v1.1   use base difference      Z.H.Zhong at 03/17/2019
-;;v1.2   add nolasco mode         Z.H.Zhong at 03/18/2019
+;;v1.2   add keyword nolasco      Z.H.Zhong at 03/18/2019
+;;v1.3   add keyword base         Z.H.Zhong at 03/19/2019
 
-if not keyword_set(nolasco) then nolasco=2 
+
+if not keyword_set(nolasco) then nolasco=2
+if not keyword_set(base) then base=0 
 
 ;set base 
-k=head-2
+k=base
 ;find fits file
 patha='/home/zhzhong/Desktop/mywork/data/'+date+'/STA'
 pathb='/home/zhzhong/Desktop/mywork/data/'+date+'/STB'
