@@ -34,5 +34,5 @@ pro lasco_try,date=date
     endfor
 
 ;;make a movie using the picture which we drawed just now
-    spawn,'ffmpeg -start_number 1 -i '+pathpicture+'/%02d.png'+' '+pathpicture+'/'+name+'.mpeg'   
+    spawn,'ffmpeg -start_number 1 -y -i '+pathpicture+'/%02d.png'+' '+pathpicture+'/'+name+'.mpeg'   
 end

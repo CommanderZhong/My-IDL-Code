@@ -1,2 +1,5 @@
 #IDL
 *.sav
+
+#Edit
+*.swp
