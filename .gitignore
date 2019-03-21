@@ -3,3 +3,8 @@
 
 #Edit
 *.swp
+
+#Picture
+*.eps
+*.png
+*.jpg
