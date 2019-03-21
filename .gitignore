@@ -1,10 +1,12 @@
 #IDL
 *.sav
+*.dat
 
 #Edit
 *.swp
 
 #Picture
 *.eps
+*.ps
 *.png
 *.jpg

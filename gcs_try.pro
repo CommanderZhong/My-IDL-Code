@@ -1,3 +1,21 @@
+pro findloc,data,val,x,y
+;From Jiayi Liu
+;To find overlap points---deal with the problem of contour
+  n1=n_elements(data[0,*])
+  n2=n_elements(data[*,0])
+  x=-1 & y=-1
+  for i=0,n1-1 do begin
+    for j=0,n2-1 do begin
+      if (abs(data[j,i]-val) le 0.01) then begin ;or data[j,i] eq va1
+        x=[x,j] & y=[y,i]
+      endif
+    endfor
+  endfor
+  id=where(x ge 0)
+  x=x[id]
+  y=y[id]
+end
+
 pro sav_read,date=date,nolasco=nolasco
 
 ;;To read sav data file
@@ -35,7 +53,9 @@ for i=0,m-1 do begin
   plot_image,sgui.ima,position=[0.0025,0.0,0.3325,0.5],charsize=3,xtickformat='(A6)',ytickformat='(A6)'
   xyouts,0.1675,0.03,'STEREO-A '+SGUI.HDRA.DATE_OBS,/NORMAL,ALIGNMENT=0.5,CHARSIZE=1.5,COLOR=255
   tvlct,0,255,0,254 ;Green
-  contour,swire.sa.im,/overplot,color=254,levels=1
+  findloc,swire.sa.im,1,x,y
+  plots,x,y,psym=3,color=254
+  ;contour,swire.sa.im,/overplot,color=254,levels=1
   loadct,0l
   plot_image,sgui.ima,position=[0.0025,0.5,0.3325,1],charsize=3,xtickformat='(A6)',ytickformat='(A6)'
 ;LASCO
@@ -45,7 +65,9 @@ for i=0,m-1 do begin
     plot_image,sgui.imlasco,position=[0.3350,00.,0.6650,0.5],charsize=3,xtickformat='(A6)',ytickformat='(A6)'
     xyouts,0.165+0.335,0.03,'LASCO C2 20'+strmid(date,0,2)+'-'+strmid(date,2,2)+'-'+strmid(date,4,2)+'T'+SGUI.SHDRLASCO.TIME_OBS,/NORMAL,ALIGNMENT=0.5,CHARSIZE=1.5,COLOR=255
     tvlct,0,255,0,254
-    contour,swire.slasco.im,/overplot,color=254,levels=1
+    findloc,swire.sa.im,1,x,y  ;to deal with overlap points
+    plots,x,y,psym=3,color=254
+    ;contour,swire.slasco.im,/overplot,color=254,levels=1
     loadct,0l
     plot_image,sgui.imlasco,position=[0.3350,00.5,0.6650,1],charsize=3,xtickformat='(A6)',ytickformat='(A6)' ;without gcs model
   endelse
@@ -53,12 +75,14 @@ for i=0,m-1 do begin
   plot_image,sgui.imb,position=[0.6675,0.00,0.9975,0.5],charsize=3,xtickformat='(A6)',ytickformat='(A6)'
   xyouts,0.165+0.6675,0.03,'STEREO-B '+SGUI.HDRb.DATE_OBS,/NORMAL,ALIGNMENT=0.5,CHARSIZE=1.5,COLOR=255
   tvlct,0,255,0,254
-  contour,swire.sb.im,/overplot,color=254,levels=1
+  ;contour,swire.sb.im,/overplot,color=254,levels=1
+  findloc,swire.sa.im,1,x,y
+  plots,x,y,psym=3,color=254
   loadct,0l
   plot_image,sgui.imb,position=[0.6675,0.5,0.9975,1.],charsize=3,xtickformat='(A6)',ytickformat='(A6)'
 
   !p.multi=0
-  ;write_image,'result.png','png',tvrd(true=1)
+  ;write_image,'result.png','png',tvrd(true=1)  ;to plot with windows
   device,/close
   set_plot,'x'
 ;save 6 parameters
