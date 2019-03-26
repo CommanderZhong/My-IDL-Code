@@ -17,14 +17,14 @@ pro findloc,data,val,x,y
 end
 
 pro sav_read,date=date,nolasco=nolasco
-
+;+
 ;;To read sav data file
 ;;keyword:
 ;;      date:the date of sav file
 ;;      nolasco:if nolasco ,set /nolasco
 ;;example:
 ;;       sav_read,date='120623',/nolasco
-
+;-
 if not keyword_set(nolasco) then nolasco=2
 
 path='/home/zhzhong/Desktop/mywork/work/savdata/'+date+'/'
@@ -102,8 +102,9 @@ end
 
 pro gcs_try,date=date,base=base,nolasco=nolasco,head,tail
 
+;+
 ;;Purpose:   To use gcs model 
-;;Use:   gcs_try,date=date,head,tail[,/nolasco]
+;;Use:   gcs_try,date=date,head,tail[,base=base,/nolasco]
 ;;Keywords:
 ;;       date:string,the date to use gcs model
 ;;       nolasco:set /nolasco if there is no lasco data
@@ -118,6 +119,7 @@ pro gcs_try,date=date,base=base,nolasco=nolasco,head,tail
 ;;v1.2   add keyword nolasco                     Z.H.Zhong at 03/18/2019
 ;;v1.3   add keyword base                        Z.H.Zhong at 03/19/2019
 ;;v1.4   use keyword swire(rtsccguicloud.pro)    Z.H.Zhong at 03/21/2019
+;-
 
 if not keyword_set(nolasco) then nolasco=2
 if not keyword_set(base) then base=0 
