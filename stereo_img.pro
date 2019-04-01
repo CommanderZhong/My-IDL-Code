@@ -1,5 +1,4 @@
 pro stereo_img,date=date,sat=sat,instr=instr
-
 ;+
 ;;To draw STEREO  picture
 ;;example:
