@@ -16,7 +16,7 @@ pro findloc,data,val,x,y
   y=y[id]
 end
 
-pro sav_read,date=date,nolasco=nolasco
+pro sav_read,date=date,nolasco=nolasco,path=path
 ;+
 ;;To read sav data file
 ;;keyword:
@@ -26,9 +26,9 @@ pro sav_read,date=date,nolasco=nolasco
 ;;       sav_read,date='120623',/nolasco
 ;-
 if not keyword_set(nolasco) then nolasco=2
+if not keyword_set(path) then path='/home/zhzhong/Desktop/mywork/work/result/'+date+'/'
 
-path='/home/zhzhong/Desktop/mywork/work/savdata/'+date+'/'
-file=findfile(path+'*.sav')
+file=findfile(path+date+'savdata*.sav')
 ;There are 6 kinds of parameters in total
 n=6
 m=1
@@ -46,7 +46,7 @@ for i=0,m-1 do begin
   restore,file(i)
   ;make a eps picture
   set_plot,'ps'   ;plot eps
-  device,filename=path+date+string(i+1,format='(I2.2)')+'.eps',xsize=50,ysize =33,/color,ENCAPSULATED=1,BITS_PER_PIXEL=8
+  device,filename=path+date+'eps'+string(i+1,format='(I2.2)')+'.eps',xsize=50,ysize =33,/color,ENCAPSULATED=1,BITS_PER_PIXEL=8
   loadct,0l
   !p.multi=[0,2,3]
 ;STEREO Ahead
@@ -65,7 +65,7 @@ for i=0,m-1 do begin
     plot_image,sgui.imlasco,position=[0.3350,00.,0.6650,0.5],charsize=3,xtickformat='(A6)',ytickformat='(A6)'
     xyouts,0.165+0.335,0.03,'LASCO C2 20'+strmid(date,0,2)+'-'+strmid(date,2,2)+'-'+strmid(date,4,2)+'T'+SGUI.SHDRLASCO.TIME_OBS,/NORMAL,ALIGNMENT=0.5,CHARSIZE=1.5,COLOR=255
     tvlct,0,255,0,254
-    findloc,swire.sa.im,1,x,y  ;to deal with overlap points
+    findloc,swire.slasco.im,1,x,y  ;to deal with overlap points
     plots,x,y,psym=3,color=254
     ;contour,swire.slasco.im,/overplot,color=254,levels=1
     loadct,0l
@@ -76,7 +76,7 @@ for i=0,m-1 do begin
   xyouts,0.165+0.6675,0.03,'STEREO-B '+SGUI.HDRb.DATE_OBS,/NORMAL,ALIGNMENT=0.5,CHARSIZE=1.5,COLOR=255
   tvlct,0,255,0,254
   ;contour,swire.sb.im,/overplot,color=254,levels=1
-  findloc,swire.sa.im,1,x,y
+  findloc,swire.sb.im,1,x,y
   plots,x,y,psym=3,color=254
   loadct,0l
   plot_image,sgui.imb,position=[0.6675,0.5,0.9975,1.],charsize=3,xtickformat='(A6)',ytickformat='(A6)'
@@ -164,16 +164,16 @@ for i=head,tail do begin
   endelse
         
 	;save sav data file
-	savfile='/home/zhzhong/Desktop/mywork/work/savdata/'+date+'/'
+	savfile='/home/zhzhong/Desktop/mywork/work/result/'+date+'/'
 	spawn,'mkdir -p '+savfile
-	name=savfile+'/out'+string(i-head+1,format='(I2.2)')+'.sav'
+	name=savfile+date+'savdata'+string(i-head+1,format='(I2.2)')+'.sav'
 	SAVE,sgui,swire,FILENAME=name
 endfor
 
    ;call for procedure sav_read
    if nolasco eq 1 then begin 
-    sav_read,date=date,/nolasco
+    sav_read,date=date,/nolasco,path=savfile
    endif else begin
-    sav_read,date=date
+    sav_read,date=date,path=savfile
    endelse
 end

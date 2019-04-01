@@ -1,8 +1,8 @@
 ;To draw SOHO/LASCO  C2 picture
 ;Example:
-;	lasco_try,date='120704'
+;	lasco_img,date='120704'
 
-pro lasco_try,date=date
+pro lasco_img,date=date
     sat='LASCO'
     instr='C2'
     path='/home/zhzhong/Desktop/mywork/data/'+date+'/LC2'
