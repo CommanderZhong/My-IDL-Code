@@ -148,12 +148,12 @@ for i=head,tail do begin
   dataa=dataa-bdataa
   datab=datab-bdatab
 ;do data procession
-  imagea=congrid(bytscl(median(smooth(dataa,5),5),-5,5),512,512)       ;running difference -2-2
-  imageb=congrid(bytscl(median(smooth(datab,5),5),-5,5),512,512)
+  imagea=congrid(bytscl(median(smooth(dataa,5),5),-4,4),512,512)       ;running difference -2-2
+  imageb=congrid(bytscl(median(smooth(datab,5),5),-4,4),512,512)
   if nolasco ne 1 then begin
     datal=lasco_readfits(filel[i],indexl)
     datal=datal-bdatal
-    imagel=congrid(bytscl(median(smooth(datal,3),3),-80,80),512,512)      ;running difference -30-30
+    imagel=congrid(bytscl(median(smooth(datal,3),3),-60,60),512,512)      ;running difference -30-30
   endif
 	
 ;use gcs model
