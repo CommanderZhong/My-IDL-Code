@@ -35,12 +35,12 @@ m=1
 m=n_elements(file)
 par=fltarr(n,m)
 ;;create a new txt file to save parameters' data
-openw,lun,path+'parameters'+date+'.txt',/get_lun
+openw,lun,path+'parameters'+date+'.txt',/get_lun,width=113
 title='date='+date
 subtitle='TIME              LON              LAT              ROT              HAN              HGT              RAT' ;blank to keep formation
 printf,lun,title
 printf,lun,subtitle
-thisFormat='(a,6(f,2x),/)'
+thisFormat='(a,6(f,2x))'
 
 for i=0,m-1 do begin
   restore,file(i)
@@ -100,29 +100,35 @@ free_lun,lun
 end
 
 
-pro gcs_try,date=date,base=base,nolasco=nolasco,head,tail
+pro gcs_try,date=date,base=base,nolasco=nolasco,rundiff=rundiff,head,tail
 
 ;+
 ;;Purpose:   To use gcs model 
-;;Use:   gcs_try,date=date,head,tail[,base=base,/nolasco]
+;;Use:   gcs_try,date=date,head,tail[,base=base,/nolasco,/rundiff]
 ;;Keywords:
 ;;       date:string,the date to use gcs model
 ;;       nolasco:set /nolasco if there is no lasco data
 ;;       base:the base to diff
-;;       head:the start number of file
+;;       rundiff:set /rundiff to use runnig difference,when set this keyword,
+;;               keyword base will be useless
+;;       head:the start number of file,must larger than 1
 ;;       tail:the end number of file
 ;;Example:
 ;;	 gcs_try,date='120623',base=18,/nolasco,20,28 ;for nolasco
+;;   gcs_try,data='100208',/rundiff,23,28
 ;;Log:
 ;;v1.0   init                                    Z.H.Zhong at 02/26/2019
 ;;v1.1   use base difference                     Z.H.Zhong at 03/17/2019
 ;;v1.2   add keyword nolasco                     Z.H.Zhong at 03/18/2019
 ;;v1.3   add keyword base                        Z.H.Zhong at 03/19/2019
 ;;v1.4   use keyword swire(rtsccguicloud.pro)    Z.H.Zhong at 03/21/2019
+;;v1.5   add keyword rundiff                     Z.H.Zhong at 04/03/2019
 ;-
 
 if not keyword_set(nolasco) then nolasco=2
-if not keyword_set(base) then base=0 
+if not keyword_set(base) then base=0
+if not keyword_set(rundiff) then rundiff=2 
+
 
 ;set base 
 k=base
@@ -131,29 +137,50 @@ patha='/home/zhzhong/Desktop/mywork/data/'+date+'/STA'
 pathb='/home/zhzhong/Desktop/mywork/data/'+date+'/STB'
 filea=findfile(patha+'/*fts')
 fileb=findfile(pathb+'/*fts')
+
+if rundiff ne 1 then begin
 ;read base fits file
-secchi_prep,filea[k],bindexa,bdataa,/silent,/smask_on,/rotate_on,/calfac_off,/calimg_off
-secchi_prep,fileb[k],bindexb,bdatab,/silent,/smask_on,/rotate_on,/calfac_off,/calimg_off
+  secchi_prep,filea[k],bindexa,bdataa,/silent,/smask_on,/rotate_on,/calfac_off,/calimg_off
+  secchi_prep,fileb[k],bindexb,bdatab,/silent,/smask_on,/rotate_on,/calfac_off,/calimg_off
+endif
 if nolasco ne 1 then begin
   pathl='/home/zhzhong/Desktop/mywork/data/'+date+'/LC2'
   filel=findfile(pathl+'/*fts')
-  bdatal=lasco_readfits(filel[k],bindexl)
+  if rundiff ne 1 then  bdatal=lasco_readfits(filel[k],bindexl)
 endif
 
 ;do cycle to read fits file
 for i=head,tail do begin          
   secchi_prep,filea[i],indexa,dataa,/silent,/smask_on,/rotate_on,/calfac_off,/calimg_off
   secchi_prep,fileb[i],indexb,datab,/silent,/smask_on,/rotate_on,/calfac_off,/calimg_off
-;do diff
+  if rundiff eq 1 then begin
+    tempa=dataa
+    tempb=datab
+    if i eq head then begin 
+      secchi_prep,filea[i-1],bindexa,bdataa,/silent,/smask_on,/rotate_on,/calfac_off,/calimg_off
+      secchi_prep,fileb[i-1],bindexb,bdatab,/silent,/smask_on,/rotate_on,/calfac_off,/calimg_off
+    endif
+  endif
   dataa=dataa-bdataa
   datab=datab-bdatab
-;do data procession
-  imagea=congrid(bytscl(median(smooth(dataa,5),5),-4,4),512,512)       ;running difference -2-2
-  imageb=congrid(bytscl(median(smooth(datab,5),5),-4,4),512,512)
+  if rundiff eq 1 then begin
+    bdataa=tempa
+    bdatab=tempb
+  endif
+  
+;data procession
+  imagea=congrid(bytscl(median(smooth(dataa,5),5),-3,3),512,512)       ;running difference -2-2
+  imageb=congrid(bytscl(median(smooth(datab,5),5),-3,3),512,512)
+  
   if nolasco ne 1 then begin
     datal=lasco_readfits(filel[i],indexl)
+    if rundiff eq 1 then begin
+      templ=datal
+      if i eq head then bdatal=lasco_readfits(filel[i-1],bindexl)
+    endif
     datal=datal-bdatal
-    imagel=congrid(bytscl(median(smooth(datal,3),3),-60,60),512,512)      ;running difference -30-30
+    if rundiff eq 1 then bdatal=templ 
+    imagel=congrid(bytscl(median(smooth(datal,3),3),-50,50),512,512)      ;running difference -30-30
   endif
 	
 ;use gcs model
