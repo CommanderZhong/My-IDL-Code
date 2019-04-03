@@ -3,7 +3,7 @@ pro stereo_img,date=date,sat=sat,instr=instr
 ;;To draw STEREO  picture
 ;;example:
 ;;        stereo_img,date='120704',sat='STA',instr='COR2'
-;; 	 stereo_img,date='120704',sat='STA',instr='hi_1'
+;; 	      stereo_img,date='120704',sat='STA',instr='hi_1'
 ;;Writen by Z.H.Zhong
 ;;
 ;-
@@ -11,9 +11,9 @@ pro stereo_img,date=date,sat=sat,instr=instr
     path='/home/zhzhong/Desktop/mywork/data/'+date+'/'+sat+'/'
     file=findfile(path+'*fts')
     if sat eq 'STA' then begin
-	n=1
+	   n=1
     endif else begin
-	n=2
+	   n=2
     endelse
     pathpicture='/home/zhzhong/Desktop/mywork/work/picture/'+date
     pathn=pathpicture+'/p'+string(n,format='(I1)')
@@ -45,7 +45,7 @@ pro stereo_img,date=date,sat=sat,instr=instr
         tv, congrid(bytscl(median(smooth(data,5),5),-2,2),512,512)
 ;	      tv, congrid(bytscl(data,0,600),512,512)
 ;	      tv,bytscl(alog10(rebin(data,512,512) > 2000 < 3500))
-	      xyouts,0,0,title,/device
+	      xyouts,0,0,title,/device,charsize=1.0,charthick=0.5
         img=tvrd()
         ;write_image,'/home/zhzhong/Desktop/mywork/work/picture/p'+string(n,format='(I1)')+'/'+string(i,format='(I2)')+'.png','png',img,r,g,b
         write_image,pathn+'/'+string(i,format='(I2.2)')+'.png','png',img,r,g,b

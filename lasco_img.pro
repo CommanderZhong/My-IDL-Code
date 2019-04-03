@@ -26,7 +26,7 @@ pro lasco_img,date=date
         device,set_resolution=[512,512],decomposed=0
 	title=sat+'_'+instr+'_'+index.DATE_OBS+'_'+index.TIME_OBS
         tv, congrid(bytscl(median(smooth(image,3),3),-50,50),512,512)
-	xyouts,0,0,title,/device
+	xyouts,0,0,title,/device,charsize=1.0,charthick=0.5
         img=tvrd()
         write_image,pathpicture+'/'+string(i-k,format='(I2.2)')+'.png','png',img,r,g,b
         device,/close
