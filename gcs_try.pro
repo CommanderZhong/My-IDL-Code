@@ -114,7 +114,7 @@ pro gcs_try,date=date,base=base,nolasco=nolasco,rundiff=rundiff,head,tail
 ;;       head:the start number of file,must larger than 1
 ;;       tail:the end number of file
 ;;Example:
-;;	 gcs_try,date='120623',base=18,/nolasco,20,28 ;for nolasco
+;;	 gcs_try,date='120623',base=18,/nolasco,20,28
 ;;   gcs_try,data='100208',/rundiff,23,28
 ;;Log:
 ;;v1.0   init                                    Z.H.Zhong at 02/26/2019
