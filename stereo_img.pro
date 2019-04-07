@@ -5,7 +5,6 @@ pro stereo_img,date=date,sat=sat,instr=instr
 ;;        stereo_img,date='120704',sat='STA',instr='COR2'
 ;; 	      stereo_img,date='120704',sat='STA',instr='hi_1'
 ;;Writen by Z.H.Zhong
-;;
 ;-
    
     path='/home/zhzhong/Desktop/mywork/data/'+date+'/'+sat+'/'
