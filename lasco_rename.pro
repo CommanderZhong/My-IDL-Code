@@ -10,7 +10,7 @@ pro lasco_rename,date=date
     for i=0,n_elements(file)-1 do begin             
 	data=lasco_readfits(file(i),index)
 	name=index.DATE_OBS+'_'+index.TIME_OBS
-	name='C2_'+strMid(name,0,4)+strMid(name,5,2)+strmid(name,8,5)+strmid(name,14,2)+strMid(name,17,6)+'.fts'
+	name='C2_'+strMid(name,0,4)+strMid(name,5,2)+strmid(name,8,5)+strmid(name,14,2)+strMid(name,17,2)+'.fts'
 	file_move,file(i),name
     endfor
     cd,'/home/zhzhong/Desktop/mywork/work/code'
