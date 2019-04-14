@@ -169,8 +169,8 @@ for i=head,tail do begin
   endif
   
 ;data procession
-  imagea=congrid(bytscl(median(smooth(dataa,5),5),-3,3),512,512)       ;running difference -2-2
-  imageb=congrid(bytscl(median(smooth(datab,5),5),-3,3),512,512)
+  imagea=congrid(bytscl(median(smooth(dataa,5),5),-2,2),512,512)       ;running difference -2-2
+  imageb=congrid(bytscl(median(smooth(datab,5),5),-2,2),512,512)
   
   if nolasco ne 1 then begin
     datal=lasco_readfits(filel[i],indexl)
