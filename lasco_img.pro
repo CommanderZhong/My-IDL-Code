@@ -28,11 +28,11 @@ pro lasco_img,date=date
         tv, congrid(bytscl(median(smooth(image,3),3),-50,50),512,512)
 	xyouts,0,0,title,/device,charsize=1.0,charthick=0.5
         img=tvrd()
-        write_image,pathpicture+'/'+string(i-k,format='(I2.2)')+'.png','png',img,r,g,b
+        write_image,pathpicture+'/'+string(i-k,format='(I3.3)')+'.png','png',img,r,g,b
         device,/close
         set_plot,'x'
     endfor
 
 ;;make a movie using the picture which we drawed just now
-    spawn,'ffmpeg -start_number 1 -y -i '+pathpicture+'/%02d.png'+' '+pathpicture+'/'+name+'.mpeg'   
+    spawn,'ffmpeg -start_number 1 -y -i '+pathpicture+'/%003d.png'+' '+pathpicture+'/'+name+'.mpeg'   
 end
