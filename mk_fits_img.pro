@@ -6,11 +6,11 @@ pro mk_fits_img
 ;path='/home/zhzhong/Desktop/mywork/data/'
 ;cd,path
 ;spawn,'ls',datelist  ;get filename
-datelist=['100616','110119','110121','110130','110325','110711','110914','111001','111002','111026'] ;'110915'
+datelist=['100420','100617','110915','120224','120330','120419','120423','120429','120528','120701','120707'] 
 for i=0,n_elements(datelist)-1 do begin
   stereo_img,date=datelist(i),sat='STA',instr='COR2'
   stereo_img,date=datelist(i),sat='STB',instr='COR2'
-  lasco_rename,date=datelist(i)
+  ;lasco_rename,date=datelist(i)
   lasco_img,date=datelist(i)
 endfor
 ;cd,'/home/zhzhong/Desktop/mywork/work/code'
