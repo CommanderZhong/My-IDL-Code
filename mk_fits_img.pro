@@ -6,7 +6,7 @@ pro mk_fits_img
 ;path='/home/zhzhong/Desktop/mywork/data/'
 ;cd,path
 ;spawn,'ls',datelist  ;get filename
-datelist=['110913','120712','120814','120902',120924,'120928','121005','121009'] 
+datelist=['110913','120712','120814','120902','120924','120928','121005','121009'] 
 for i=0,n_elements(datelist)-1 do begin
   stereo_img,date=datelist(i),sat='STA',instr='COR2'
   stereo_img,date=datelist(i),sat='STB',instr='COR2'
