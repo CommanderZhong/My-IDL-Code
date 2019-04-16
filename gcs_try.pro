@@ -183,7 +183,7 @@ for i=head,tail do begin
     endif
     datal=datal-bdatal
     if rundiff eq 1 then bdatal=templ 
-    imagel=congrid(bytscl(median(smooth(datal,3),3),-50,50),512,512)      ;running difference -30-30
+    imagel=congrid(bytscl(median(smooth(datal,3),3),-50*resl/2.0,50*resl/2.0),512,512)      ;running difference -30-30
   endif
 	
 ;use gcs model
