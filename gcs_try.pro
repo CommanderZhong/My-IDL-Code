@@ -111,7 +111,7 @@ pro gcs_try,date=date,base=base,nolasco=nolasco,rundiff=rundiff,head,tail
 ;;       base:the base to diff
 ;;       rundiff:set /rundiff to use runnig difference,when set this keyword,
 ;;               keyword base will be useless
-;;       head:the start number of file,must larger than 1
+;;       head:the start number of file, generally need to be larger than 1
 ;;       tail:the end number of file
 ;;Example:
 ;;	 gcs_try,date='120623',base=18,/nolasco,20,28
