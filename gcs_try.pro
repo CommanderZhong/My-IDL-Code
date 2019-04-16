@@ -125,13 +125,13 @@ pro gcs_try,date=date,base=base,nolasco=nolasco,rundiff=rundiff,$
 ;;v1.3   add keyword base                        Z.H.Zhong at 03/19/2019
 ;;v1.4   use keyword swire(rtsccguicloud.pro)    Z.H.Zhong at 03/21/2019
 ;;v1.5   add keyword rundiff                     Z.H.Zhong at 04/03/2019
-;;v1.6   add keyword resl                  Z.H.Zhong at 04/16/2019
+;;v1.6   add keyword resl                        Z.H.Zhong at 04/16/2019
 ;-
 
 if not keyword_set(nolasco) then nolasco=2
 if not keyword_set(base) then base=head-1
 if not keyword_set(rundiff) then rundiff=2 
-if not keyword_set(resolution) then resl=2
+if not keyword_set(resl) then resl=2
 
 
 ;set base 
@@ -171,7 +171,6 @@ for i=head,tail do begin
     bdataa=tempa
     bdatab=tempb
   endif
-  
 ;data procession
   imagea=congrid(bytscl(median(smooth(dataa,5),5),-resl,resl),512,512)       ;running difference -2-2
   imageb=congrid(bytscl(median(smooth(datab,5),5),-resl,resl),512,512)
