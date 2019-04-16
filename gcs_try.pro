@@ -100,7 +100,8 @@ free_lun,lun
 end
 
 
-pro gcs_try,date=date,base=base,nolasco=nolasco,rundiff=rundiff,head,tail
+pro gcs_try,date=date,base=base,nolasco=nolasco,rundiff=rundiff,$
+            resl=resl,head,tail
 
 ;+
 ;;Purpose:   To use gcs model 
@@ -111,11 +112,12 @@ pro gcs_try,date=date,base=base,nolasco=nolasco,rundiff=rundiff,head,tail
 ;;       base:the base to diff
 ;;       rundiff:set /rundiff to use runnig difference,when set this keyword,
 ;;               keyword base will be useless
-;;       head:the start number of file,must larger than 1
+;;       resl: the resolution of STEREO image
+;;       head:the start number of file, generally need to be larger than 1
 ;;       tail:the end number of file
 ;;Example:
 ;;	 gcs_try,date='120623',base=18,/nolasco,20,28
-;;   gcs_try,data='100208',/rundiff,23,28
+;;   gcs_try,data='100208',/rundiff,resl=3,23,28
 ;;Log:
 ;;v1.0   init                                    Z.H.Zhong at 02/26/2019
 ;;v1.1   use base difference                     Z.H.Zhong at 03/17/2019
@@ -123,11 +125,13 @@ pro gcs_try,date=date,base=base,nolasco=nolasco,rundiff=rundiff,head,tail
 ;;v1.3   add keyword base                        Z.H.Zhong at 03/19/2019
 ;;v1.4   use keyword swire(rtsccguicloud.pro)    Z.H.Zhong at 03/21/2019
 ;;v1.5   add keyword rundiff                     Z.H.Zhong at 04/03/2019
+;;v1.6   add keyword resl                        Z.H.Zhong at 04/16/2019
 ;-
 
 if not keyword_set(nolasco) then nolasco=2
-if not keyword_set(base) then base=0
+if not keyword_set(base) then base=head-1
 if not keyword_set(rundiff) then rundiff=2 
+if not keyword_set(resl) then resl=2
 
 
 ;set base 
@@ -167,10 +171,9 @@ for i=head,tail do begin
     bdataa=tempa
     bdatab=tempb
   endif
-  
 ;data procession
-  imagea=congrid(bytscl(median(smooth(dataa,5),5),-2,2),512,512)       ;running difference -2-2
-  imageb=congrid(bytscl(median(smooth(datab,5),5),-2,2),512,512)
+  imagea=congrid(bytscl(median(smooth(dataa,5),5),-resl,resl),512,512)       ;running difference -2-2
+  imageb=congrid(bytscl(median(smooth(datab,5),5),-resl,resl),512,512)
   
   if nolasco ne 1 then begin
     datal=lasco_readfits(filel[i],indexl)
@@ -180,7 +183,7 @@ for i=head,tail do begin
     endif
     datal=datal-bdatal
     if rundiff eq 1 then bdatal=templ 
-    imagel=congrid(bytscl(median(smooth(datal,3),3),-50,50),512,512)      ;running difference -30-30
+    imagel=congrid(bytscl(median(smooth(datal,3),3),-50*resl/2.0,50*resl/2.0),512,512)      ;running difference -30-30
   endif
 	
 ;use gcs model
