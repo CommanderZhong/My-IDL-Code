@@ -126,7 +126,7 @@ pro gcs_try,date=date,base=base,nolasco=nolasco,rundiff=rundiff,head,tail
 ;-
 
 if not keyword_set(nolasco) then nolasco=2
-if not keyword_set(base) then base=0
+if not keyword_set(base) then base=head-1
 if not keyword_set(rundiff) then rundiff=2 
 
 
