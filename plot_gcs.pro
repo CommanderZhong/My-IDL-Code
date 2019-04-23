@@ -1,7 +1,7 @@
 pro plot_gcs,date=date,png=png,ps=ps,degree=degree
 ;+
 ;Purpose: TO plot CMEs front's hight-time image
-;Syntax: plot_gcs,date=date,[/ps,/png]
+;Syntax: plot_gcs,date=date,[/ps,/png[,degree=value]]
 ;Keyword:
 ; date:the string of date,with format of 'yymmdd',like '101206'
 ; png:set /png to save png image
@@ -12,7 +12,8 @@ pro plot_gcs,date=date,png=png,ps=ps,degree=degree
 ; plot_gcs,date='111001',/png
 ;
 ;Log:
-; v1.0  init            Z.H.Zhong at 04/21/2019
+; v1.0  init                       Z.H.Zhong at 04/21/2019
+; v1.1  add keyword png,ps,degree  Z.H.Zhong at 04/23/2019
 ;-
 
 if not keyword_set(date) then date='111001'
