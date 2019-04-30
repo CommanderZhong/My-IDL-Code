@@ -36,11 +36,9 @@ m=n_elements(file)
 par=fltarr(n,m)
 ;;create a new txt file to save parameters' data
 openw,lun,path+'parameters'+date+'.txt',/get_lun,width=113
-title='date='+date
-subtitle='TIME              LON              LAT              ROT              HAN              HGT              RAT' ;blank to keep formation
+title='DATE     TIME              LON              LAT              ROT              HAN              HGT              RAT' ;blank to keep formation
 printf,lun,title
-printf,lun,subtitle
-thisFormat='(a,6(f,2x))'
+thisFormat='(a8,1x,a,6(f,2x))'
 
 for i=0,m-1 do begin
   restore,file(i)
@@ -92,8 +90,9 @@ for i=0,m-1 do begin
   par[3,i]=sgui.HAN
   par[4,i]=sgui.HGT
   par[5,i]=sgui.RAT
+  eruptiondate=strmid(sgui.ERUPTIONDATE,0,4)+strmid(sgui.ERUPTIONDATE,5,2)+strmid(sgui.ERUPTIONDATE,8,2)
   eruptiontime=strmid(sgui.ERUPTIONDATE,11,12)
-  printf,lun,eruptiontime,par[*,i],Format=thisFormat
+  printf,lun,eruptiondate,eruptiontime,par[*,i],Format=thisFormat
 endfor
 free_lun,lun
 
