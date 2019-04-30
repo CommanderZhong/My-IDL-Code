@@ -1,5 +1,3 @@
-pro plot_gcs,date=date,nosr=nosr,png=png,ps=ps,degree=degree,$
-             nolist=nolist          
 ;+
 ;Purpose: TO plot CMEs front's hight-time image
 ;Syntax: plot_gcs,date=date,[/nosr,/ps[,/png],degree=value]
@@ -8,7 +6,7 @@ pro plot_gcs,date=date,nosr=nosr,png=png,ps=ps,degree=degree,$
 ; nosr:do not plot source region image
 ; png:set /png to save png image
 ; ps:set /ps to save ps image
-; degree:the degree of polynomial fit of data,at least 2;with a 
+; degree:the degree of polynomial fit of data,at least 2;with a
 ;        form of f(x)=x1+x2*x+x3*x^2+……
 ;Example:
 ; plot_gcs,date='111001',/png,/nolist
@@ -17,7 +15,11 @@ pro plot_gcs,date=date,nosr=nosr,png=png,ps=ps,degree=degree,$
 ; v1.0  init                       Z.H.Zhong at 04/21/2019
 ; v1.1  add keyword png,ps,degree  Z.H.Zhong at 04/23/2019
 ; v1.2  add keyword nosr,nolist    Z.H.Zhong at 04/24/2019
+; v1.3  add lin-fit                Z.H.Zhong at 04/30/2019
 ;-
+
+pro plot_gcs,date=date,nosr=nosr,png=png,ps=ps,degree=degree,$
+             nolist=nolist          
 
 bpath='/home/zhzhong/Desktop/mywork/work/'
 if keyword_set(nolist) then begin
