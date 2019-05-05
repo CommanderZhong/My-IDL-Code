@@ -37,12 +37,14 @@ fmt='(a8,1x,a8,10x,f9.7,7x,f10.7,7x,f10.7,8x,f9.7,7x,f10.7,8x,f9.7)'
 info={Date:'',TIME:'',LON:0.0,LAT:0.0,ROT:0.0,HAN:0.0,HGT:0.0,RAT:0.0}
 lat=[]
 lon=[]
+v=[] ;velocity
+acc=[] ;acceleration
 for d=0,n_elements(date)-1 do begin
   path=findfile(bpath+'result/'+date[d]+'/*.txt')
   openr,lun,path,/get_lun
   nlines=3l
   nlines=FILE_LINES(path)
-  num=nlines-2
+  num=nlines-1
   para=replicate(info,num) ;parameters
   ;read data from data file
   jump=''
@@ -106,13 +108,13 @@ for d=0,n_elements(date)-1 do begin
   !p.charsize=1.0
   !p.multi=[0,2,1]
   loadct,0l
-  utplot,time,Hight,date1[0]+para[0].TIME,/nodata,xstyle=1,ytitle='Hight/km',position=[0.10,0.57,0.99,0.9],xtickformat='(A6)',xtitle='',title='Hight/Velocity-Time Image'
+  utplot,time,Hight,date1[0]+para[0].TIME,/nodata,xstyle=1,ytitle='Hight(km)',position=[0.10,0.57,0.99,0.9],xtickformat='(A6)',xtitle='',title='Hight/Velocity-Time Image'
   oplot,time,Hight,psym=7,color=fsc_color('red')
   oplot,time1,H_fit,color=fsc_color('blue')
   oplot,time1,H_linfit,color=fsc_color('green'),linestyle=2
   xyouts,0.12,0.62,H_function,color=fsc_color('green'),/normal,CHARSIZE=0.9
   loadct,0l
-  utplot,time1,V_fit,date1[0]+para[0].TIME,/nodata,xstyle=1,ytitle='Velocity/km*s!E-1!N',position=[0.10,0.1,0.99,0.55];,titile='Velocity-TIme Image'
+  utplot,time1,V_fit,date1[0]+para[0].TIME,/nodata,xstyle=1,ytitle='Velocity(km*s!E-1!N)',position=[0.10,0.1,0.99,0.55];,titile='Velocity-TIme Image'
   oplot,time1,V_fit,color=fsc_color('blue')
   oplot,time1,replicate(coeff[1],npoints),color=fsc_color('green'),linestyle=2
   xyouts,0.12,0.15,V_function,color=fsc_color('green'),/normal,CHARSIZE=0.9
@@ -131,14 +133,70 @@ for d=0,n_elements(date)-1 do begin
   endif
   lat=[lat,para[0].lat]
   lon=[lon,para[0].lon]
+  v=[v,coeff[1]]
+  acc=[acc,2*fit_result[0,2]]
 endfor
-help,lat
+lat=lat/!dtor
+lon=lon/!dtor-168.103
+;read data from Prof. Shen
+fmt1='(a8,1x,a8,1x,f3,1x,f3,1x,f3,1x,f4)'
+info1={Date:'',TIME:'',LON:0.0,LAT:0.0,AN:0.0,V:0.0}
+path1=findfile(bpath+'*.txt')
+openr,lun,path1,/get_lun
+nlines1=3l
+nlines1=FILE_LINES(path1)
+num1=nlines1-1
+para1=replicate(info1,num1) ;parameters
+;read data from data file
+jump1=''
+readf,lun,jump1
+nrecords1=0L
+while(nrecords1 ne num1) do begin
+  readf,lun,info1,format=fmt1
+  para1[nrecords1]=info1
+  nrecords1=nrecords1+1L
+endwhile
+free_lun,lun
+lat=[lat,para1.lat]
+lon=[lon,para1.lon]
+v=[v,para1[where(para1.v gt 0)].v]
+
+;plots histogram
+;if keyword_set(png) then begin
+;  ;  loadct,0
+;  set_plot,'z'
+;  device,SET_RESOLUTION=resolution,SET_PIXEL_DEPTH=24,decomposed=0
+;endif
+;if keyword_set(ps) then begin
+;  set_plot,'ps'
+;  device,filename=bpath+'result_image/histogram.eps',/color,xs=24,ys=12,ENCAPSULATED=1
+;endif
+binsize=200
+binsize1=0.015
+vhist=histogram(v,BINSIZE=binsize,locations=binvals)
+acchist=histogram(acc,BINSIZE=binsize1,locations=binvals1)
+;acchist=histogram(acc
+;histplot=plot(vhist,binvals,/current,/stairstep)
+histplot=barplot(binvals,vhist,layout=[1,2,1],xtitle='Velocity(km.s!E-1!N)',ytitle='Num(#)')
+histplot=plot(binvals,vhist,/overplot)
+histplot=barplot(binvals1,acchist,/curr,layout=[1,2,2],xtitle='Acceleration(km.s!E-2!N)',ytitle='Num(#)')
+histplot=plot(binvals1,acchist,/overplot)
+;if keyword_set(png) then begin
+;  a=tvrd(/true)
+;  filename=bpath+'result_image/histogram.png'
+;  write_image,filename,"png",a,r,g,b
+;  device,/close
+;  set_plot,'x'
+;endif
+;if keyword_set(ps) then begin
+;  device,/close
+;  set_plot,'x'
+;endif
+
 ;;plot soure region
 if not keyword_set(nosr) then begin
-;aia_prep,'aia.lev1_euv_12s.2011-01-01T115933Z.193.image_lev1.fits',-1,index,data;要联网，经过修正
-read_sdo,'/home/zhzhong/Desktop/mywork/aia.lev1_euv_12s.2011-01-01T115933Z.193.image_lev1.fits',index,data;不要联网，未经修正
+read_sdo,'/home/zhzhong/Desktop/mywork/aia.lev1_euv_12s.2011-01-01T115933Z.193.image_lev1.fits',index,data
 if keyword_set(png) then begin
-  ;  loadct,0
   set_plot,'z'
   device,SET_RESOLUTION=resolution,SET_PIXEL_DEPTH=24,decomposed=0
 endif
@@ -146,21 +204,18 @@ if keyword_set(ps) then begin
   set_plot,'ps'
   device,filename=bpath+'result_image/source_region.eps',/color,xs=24,ys=30,ENCAPSULATED=1
 endif
+
 !p.multi=[0,2,1]
 contour,data-data,xtickformat='(A6)',ytickformat='(A6)',xstyle=1,ystyle=1,position=[0.10,0.37,0.99,0.8],title='Source Region of CMEs'
-;plot_image,bytscl(data/index.exptime,0,1),xtickformat='(A6)',ytickformat='(A6)',position=[0.10,0.37,0.99,0.8],title='Source Region of CMEs'
-;help,index,/str
 wcs=fitshead2wcs(index)
 n=401
 theta=findgen(n)*2*!pi/(n-1)
 xy=fltarr(2,n)
 xy[0,*]=sin(theta)*index.r_sun+2048
 xy[1,*]=cos(theta)*index.r_sun+2048
-;xy=wcs_get_pixel(wcs,xy*index.rsun_obs) ;rsun_obs,rsun_ref,r_sun
 ;print,index.rsun_obs,index.rsun_ref,index.r_sun
 plots,xy,color=fsc_color('red')
-lat=lat/!dtor
-lon=lon/!dtor-168.103 ;0-360
+
 lat1=lat
 lon1=lon
 for i=0l,n_elements(lat)-1 do begin
@@ -170,25 +225,16 @@ for i=0l,n_elements(lat)-1 do begin
   endif else begin
     color1='green'
   endelse
-  ;wcs_convert_to_coord,wcs,coord,'HG',lon1[i],lat1[i]
-  ;pixel=wcs_get_pixel(wcs,coord)
+
   xlon=2048+index.r_sun*cos(lat1[i]*!dtor)*sin(lon1[i]*!dtor)
   ylat=2048+sin(lat1[i]*!dtor)*index.r_sun
   plots,xlon,ylat,color=fsc_color(color1),psym=1
-  ;plots,pixel[0],pixel[1],color=fsc_color(color1),psym=1
 endfor
-;for i=0,355,5 do begin
-;wcs_convert_to_coord,wcs,coord,'HG',/Carrington,i,40
-;pixel=wcs_get_pixel(wcs,coord)
-;plots,pixel[0],pixel[1],color=fsc_color('black'),psym=3
-;endfor
+
 loadct,0l
 xyouts,0.55,0.40,'Green + --Front of The Solar Disk',/normal,ALIGNMENT=0.5
 xyouts,0.55,0.38,'Blue  + --Back of The Solar Disk',/normal,ALIGNMENT=0.5
-;wcs_convert_to_coord,wcs,coord,'HG',/Carrington,330,0
-;pixel=wcs_get_pixel(wcs,coord)
-;plots,pixel[0],pixel[1],color=fsc_color(color1),psym=1
-;loadct,0l
+
 maxlat=max(lat)
 minlat=min(lat)
 l=indgen(361)-180
