@@ -39,6 +39,7 @@ lat=[]
 lon=[]
 v=[] ;velocity
 acc=[] ;acceleration
+back=''
 for d=0,n_elements(date)-1 do begin
   path=findfile(bpath+'result/'+date[d]+'/*.txt')
   openr,lun,path,/get_lun
@@ -96,7 +97,11 @@ for d=0,n_elements(date)-1 do begin
   if keyword_set(png) then begin
     ;  loadct,0
     set_plot,'z'
-    device,SET_RESOLUTION=resolution,SET_PIXEL_DEPTH=24,decomposed=0
+    device,SET_RESOLUTION=[1024,512],decomposed=0
+    bground=!p.background
+    bcolor=!p.color
+    !p.background='FFFFFF'xl
+    !p.color='000000'xl
   endif
   if keyword_set(ps) then begin
     set_plot,'ps'
@@ -118,12 +123,15 @@ for d=0,n_elements(date)-1 do begin
   oplot,time1,V_fit,color=fsc_color('blue')
   oplot,time1,replicate(coeff[1],npoints),color=fsc_color('green'),linestyle=2
   xyouts,0.12,0.15,V_function,color=fsc_color('green'),/normal,CHARSIZE=0.9
+  xyouts,0.15,coeff[1]+5,string(coeff[1]),color=fsc_color('green')
   loadct,0l
   !p.multi=0
   if keyword_set(png) then begin
     a=tvrd(/true)
     filename=bpath+'result_image/'+date[d]+'.png'
     write_image,filename,"png",a,r,g,b
+    !p.background=bground
+    !p.color=bcolor
     device,/close
     set_plot,'x'
   endif
@@ -135,7 +143,9 @@ for d=0,n_elements(date)-1 do begin
   lon=[lon,para[0].lon]
   v=[v,coeff[1]]
   acc=[acc,2*fit_result[0,2]]
+  if abs(para[0].lon/!dtor-168.103) gt 90 then back=back+para[0].date+' '+para[0].time+'      '
 endfor
+print,back
 lat=lat/!dtor
 lon=lon/!dtor-168.103
 ;read data from Prof. Shen
@@ -161,44 +171,29 @@ lat=[lat,para1.lat]
 lon=[lon,para1.lon]
 v=[v,para1[where(para1.v gt 0)].v]
 
-;plots histogram
-;if keyword_set(png) then begin
-;  ;  loadct,0
-;  set_plot,'z'
-;  device,SET_RESOLUTION=resolution,SET_PIXEL_DEPTH=24,decomposed=0
-;endif
-;if keyword_set(ps) then begin
-;  set_plot,'ps'
-;  device,filename=bpath+'result_image/histogram.eps',/color,xs=24,ys=12,ENCAPSULATED=1
-;endif
+;;plots histogram
 binsize=200
 binsize1=0.015
 vhist=histogram(v,BINSIZE=binsize,locations=binvals)
 acchist=histogram(acc,BINSIZE=binsize1,locations=binvals1)
-;acchist=histogram(acc
-;histplot=plot(vhist,binvals,/current,/stairstep)
 histplot=barplot(binvals,vhist,layout=[1,2,1],xtitle='Velocity(km.s!E-1!N)',ytitle='Num(#)')
 histplot=plot(binvals,vhist,/overplot)
 histplot=barplot(binvals1,acchist,/curr,layout=[1,2,2],xtitle='Acceleration(km.s!E-2!N)',ytitle='Num(#)')
 histplot=plot(binvals1,acchist,/overplot)
-;if keyword_set(png) then begin
-;  a=tvrd(/true)
-;  filename=bpath+'result_image/histogram.png'
-;  write_image,filename,"png",a,r,g,b
-;  device,/close
-;  set_plot,'x'
-;endif
-;if keyword_set(ps) then begin
-;  device,/close
-;  set_plot,'x'
-;endif
+if keyword_set(ps) then histplot.save,bpath+'result_image/histogram.eps',resolution=512,/transparent
+if keyword_set(png) then histplot.save,bpath+'result_image/histogram.png',resolution=512,/transparent
+histplot.close
 
 ;;plot soure region
 if not keyword_set(nosr) then begin
-read_sdo,'/home/zhzhong/Desktop/mywork/aia.lev1_euv_12s.2011-01-01T115933Z.193.image_lev1.fits',index,data
+r_sun=1625.5946 ;from sdo data index
 if keyword_set(png) then begin
   set_plot,'z'
-  device,SET_RESOLUTION=resolution,SET_PIXEL_DEPTH=24,decomposed=0
+  device,SET_RESOLUTION=[800,900],decomposed=0
+  bground=!p.background
+  bcolor=!p.color
+  !p.background='FFFFFF'xl
+  !p.color='000000'xl
 endif
 if keyword_set(ps) then begin
   set_plot,'ps'
@@ -206,14 +201,13 @@ if keyword_set(ps) then begin
 endif
 
 !p.multi=[0,2,1]
-contour,data-data,xtickformat='(A6)',ytickformat='(A6)',xstyle=1,ystyle=1,position=[0.10,0.37,0.99,0.8],title='Source Region of CMEs'
-wcs=fitshead2wcs(index)
+data=fltarr(4096,4096)
+contour,data,xtickformat='(A6)',ytickformat='(A6)',xstyle=1,ystyle=1,position=[0.10,0.37,0.99,0.8],title='Source Region of CMEs'
 n=401
 theta=findgen(n)*2*!pi/(n-1)
 xy=fltarr(2,n)
-xy[0,*]=sin(theta)*index.r_sun+2048
-xy[1,*]=cos(theta)*index.r_sun+2048
-;print,index.rsun_obs,index.rsun_ref,index.r_sun
+xy[0,*]=sin(theta)*r_sun+2048
+xy[1,*]=cos(theta)*r_sun+2048
 plots,xy,color=fsc_color('red')
 
 lat1=lat
@@ -226,8 +220,8 @@ for i=0l,n_elements(lat)-1 do begin
     color1='green'
   endelse
 
-  xlon=2048+index.r_sun*cos(lat1[i]*!dtor)*sin(lon1[i]*!dtor)
-  ylat=2048+sin(lat1[i]*!dtor)*index.r_sun
+  xlon=2048+r_sun*cos(lat1[i]*!dtor)*sin(lon1[i]*!dtor)
+  ylat=2048+sin(lat1[i]*!dtor)*r_sun
   plots,xlon,ylat,color=fsc_color(color1),psym=1
 endfor
 
@@ -255,6 +249,8 @@ if keyword_set(png) then begin
   a=tvrd(/true)
   name=bpath+'result_image/source_region.png'
   write_image,name,"png",a,r,g,b
+  !p.background=bground
+  !p.color=bcolor
   device,/close
   set_plot,'x'
 endif
