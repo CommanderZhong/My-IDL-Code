@@ -40,6 +40,7 @@ lon=[]
 v=[] ;velocity
 acc=[] ;acceleration
 han=[] ;half angle
+odd=[]
 back=''
 
 ;read data from Prof. Shen
@@ -112,9 +113,21 @@ for d=0,n_elements(date)-1 do begin
   v=[v,coeff[1]]
   acc=[acc,2*fit_result[0,2]]
   han=[han,average(para.han)]
+  odd0=[anytim2tai(date1[0]+para[0].TIME)-anytim2tai('1853/11/09 00:00:00')]/(3600.*24) mod 27.275
+  odd=[odd,odd0]
 endfor
 lat=lat/!dtor
-lon=lon/!dtor-168.103
+lon=lon/!dtor
+L0=360*(1-odd/27.)
+for i=0,n_elements(lon)-1 do begin
+  if lon[i]-L0[i] gt 0 then begin
+    lon[i]=lon[i]-L0[i]
+  endif else begin
+    lon[i]=lon[i]-L0[i]+360
+  endelse
+endfor
+loc=where(lon gt 180)
+lon(loc)=lon(loc)-360
 lat=[lat,para1.lat]
 lon=[lon,para1.lon]
 loc=where(para1.v gt 0)
