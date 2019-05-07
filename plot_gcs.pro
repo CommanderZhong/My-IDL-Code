@@ -39,7 +39,47 @@ lat=[]
 lon=[]
 v=[] ;velocity
 acc=[] ;acceleration
+han=[] ;half angle
 back=''
+
+;read data from Prof. Shen
+fmt1='(a8,1x,a8,1x,f3,1x,f3,1x,f3,1x,f4)'
+info1={Date:'',TIME:'',LON:0.0,LAT:0.0,AN:0.0,V:0.0}
+path1=findfile(bpath+'data_shen.txt')
+openr,lun,path1,/get_lun
+nlines1=3l
+nlines1=FILE_LINES(path1)
+num1=nlines1-1
+para1=replicate(info1,num1) ;parameters
+;read data from data file
+temp=''
+readf,lun,temp
+nrecords=0L
+while(nrecords ne num1) do begin
+  readf,lun,info1,format=fmt1
+  para1[nrecords]=info1
+  nrecords=nrecords+1L
+endwhile
+free_lun,lun
+;read arrive time data
+path2=findfile(bpath+'data_arrive.txt')
+openr,lun,path2,/get_lun
+nlines2=3l
+nlines2=FILE_LINES(path2)
+num2=nlines2-1
+arrive=strarr(num2)
+temp=''
+readf,lun,temp
+nrecords=0l
+while(nrecords ne num2) do begin
+  readf,lun,temp,format='(a19)'
+  arrive[nrecords]=temp
+  nrecords=nrecords+1l
+endwhile
+free_lun,lun
+
+start=strarr(n_elements(date))  ;start time of observed CME
+
 for d=0,n_elements(date)-1 do begin
   path=findfile(bpath+'result/'+date[d]+'/*.txt')
   openr,lun,path,/get_lun
@@ -48,8 +88,8 @@ for d=0,n_elements(date)-1 do begin
   num=nlines-1
   para=replicate(info,num) ;parameters
   ;read data from data file
-  jump=''
-  readf,lun,jump
+  temp=''
+  readf,lun,temp
   nrecords=0L
   while(nrecords ne num) do begin
     readf,lun,info,format=fmt
@@ -62,201 +102,35 @@ for d=0,n_elements(date)-1 do begin
   date1=strmid(para.Date,0,4)+'/'+strmid(para.Date,4,2)+'/'+strmid(para.Date,6,2)+' ' ;transfer date format 'yyyy/mm/dd'
   time=anytim2tai(date1+para.TIME)-anytim2tai(date1[0]+para[0].TIME)
   Hight=para.HGT*Rsun
+  start[d]=date1[0]+para[0].TIME
   
-  ;linfit
-  coeff=linfit(time,Hight)
+  if keyword_set(ps) then hvt_plot,time,Hight,date1[0]+para[0].TIME,num,/ps,date=date[d],bpath=bpath,coeff=coeff,fit_result=fit_result
+  if keyword_set(png) then hvt_plot,time,Hight,date1[0]+para[0].TIME,num,/png,date=date[d],bpath=bpath,coeff=coeff,fit_result=fit_result
 
-  ;use poly fit to perform polynomial fit
-  npoints=101
-  time1=lindgen(npoints)*(max(time)-min(time))/(npoints-1)+min(time) ;min(time)=0
-  H_linfit=coeff[0]+coeff[1]*time1
-  if not keyword_set(degree) then degree=2
-  measure_errors=replicate(1,num)
-  fit_result=poly_fit(time,Hight,degree,MEASURE_ERRORS=measure_errors,SIGMA=sigma)
-  H_fit=fit_result[0,0]
-  H_function='Hight_fit='+strmid(string(fit_result[0,0]),6)
-  v_fit=fit_result[0,1]
-  V_function='Velocity_fit='+strmid(string(fit_result[0,1]),5)
-  for i=0,degree-1 do begin
-    H_fit=H_fit+fit_result[0,i+1]*(time1^(i+1))
-    if fit_result[0,i+1] ge 0 then begin
-      H_function=H_function+'+'+strmid(string(fit_result[0,i+1]),3)+'*!7D!3time^'+strmid(string(i+1),7)
-    endif else begin
-      H_function=H_function+strmid(string(fit_result[0,i+1]),3)+'*!7D!3time^'+strmid(string(i+1),7)
-    endelse
-    if i ge 1 then begin
-      V_fit=V_fit+(i+1)*fit_result[0,i+1]*(time1^i)
-      if fit_result[0,i+1] ge 0 then begin
-        V_function=V_function+'+'+strmid(string(fit_result[0,i+1]),3)+'*!7D!3time^'+strmid(string(i),7)
-      endif else begin
-        V_function=V_function+strmid(string(fit_result[0,i+1]),3)+'*!7D!3time^'+strmid(string(i),7)
-      endelse
-    endif
-  endfor
-  ;plot image
-  if keyword_set(png) then begin
-    ;  loadct,0
-    set_plot,'z'
-    device,SET_RESOLUTION=[1024,512],decomposed=0
-    bground=!p.background
-    bcolor=!p.color
-    !p.background='FFFFFF'xl
-    !p.color='000000'xl
-  endif
-  if keyword_set(ps) then begin
-    set_plot,'ps'
-    device,filename=bpath+'result_image/'+date[d]+'.eps',/color,xs=24,ys=12,ENCAPSULATED=1
-  endif
-
-  !p.thick=3
-  !p.charthick=2
-  !p.charsize=1.0
-  !p.multi=[0,2,1]
-  loadct,0l
-  utplot,time,Hight,date1[0]+para[0].TIME,/nodata,xstyle=1,ytitle='Hight(km)',position=[0.10,0.57,0.99,0.9],xtickformat='(A6)',xtitle='',title='Hight/Velocity-Time Image'
-  oplot,time,Hight,psym=7,color=fsc_color('red')
-  oplot,time1,H_fit,color=fsc_color('blue')
-  oplot,time1,H_linfit,color=fsc_color('green'),linestyle=2
-  xyouts,0.12,0.62,H_function,color=fsc_color('green'),/normal,CHARSIZE=0.9
-  loadct,0l
-  utplot,time1,V_fit,date1[0]+para[0].TIME,/nodata,xstyle=1,ytitle='Velocity(km*s!E-1!N)',position=[0.10,0.1,0.99,0.55];,titile='Velocity-TIme Image'
-  oplot,time1,V_fit,color=fsc_color('blue')
-  oplot,time1,replicate(coeff[1],npoints),color=fsc_color('green'),linestyle=2
-  xyouts,0.12,0.15,V_function,color=fsc_color('green'),/normal,CHARSIZE=0.9
-  xyouts,0.15,coeff[1]+5,string(coeff[1]),color=fsc_color('green')
-  loadct,0l
-  !p.multi=0
-  if keyword_set(png) then begin
-    a=tvrd(/true)
-    filename=bpath+'result_image/'+date[d]+'.png'
-    write_image,filename,"png",a,r,g,b
-    !p.background=bground
-    !p.color=bcolor
-    device,/close
-    set_plot,'x'
-  endif
-  if keyword_set(ps) then begin
-    device,/close
-    set_plot,'x'
-  endif
   lat=[lat,para[0].lat]
   lon=[lon,para[0].lon]
   v=[v,coeff[1]]
   acc=[acc,2*fit_result[0,2]]
-  if abs(para[0].lon/!dtor-168.103) gt 90 then back=back+para[0].date+' '+para[0].time+'      '
+  han=[han,average(para.han)]
 endfor
-print,back
 lat=lat/!dtor
 lon=lon/!dtor-168.103
-;read data from Prof. Shen
-fmt1='(a8,1x,a8,1x,f3,1x,f3,1x,f3,1x,f4)'
-info1={Date:'',TIME:'',LON:0.0,LAT:0.0,AN:0.0,V:0.0}
-path1=findfile(bpath+'*.txt')
-openr,lun,path1,/get_lun
-nlines1=3l
-nlines1=FILE_LINES(path1)
-num1=nlines1-1
-para1=replicate(info1,num1) ;parameters
-;read data from data file
-jump1=''
-readf,lun,jump1
-nrecords1=0L
-while(nrecords1 ne num1) do begin
-  readf,lun,info1,format=fmt1
-  para1[nrecords1]=info1
-  nrecords1=nrecords1+1L
-endwhile
-free_lun,lun
 lat=[lat,para1.lat]
 lon=[lon,para1.lon]
-v=[v,para1[where(para1.v gt 0)].v]
+loc=where(para1.v gt 0)
+v=[v,para1[loc].v]
+han=[han,para1[loc].an/2.]
+start=[start,strmid(para1[loc].Date,0,4)+'/'+strmid(para1[loc].Date,4,2)+'/'+strmid(para1[loc].Date,6,2)+' '+para1[loc].Time]
 
-;;plots histogram
-binsize=200
-binsize1=0.015
-vhist=histogram(v,BINSIZE=binsize,locations=binvals)
-acchist=histogram(acc,BINSIZE=binsize1,locations=binvals1)
-histplot=barplot(binvals,vhist,layout=[1,2,1],xtitle='Velocity(km.s!E-1!N)',ytitle='Num(#)')
-histplot=plot(binvals,vhist,/overplot)
-histplot=barplot(binvals1,acchist,/curr,layout=[1,2,2],xtitle='Acceleration(km.s!E-2!N)',ytitle='Num(#)')
-histplot=plot(binvals1,acchist,/overplot)
-if keyword_set(ps) then histplot.save,bpath+'result_image/histogram.eps',resolution=512,/transparent
-if keyword_set(png) then histplot.save,bpath+'result_image/histogram.png',resolution=512,/transparent
-histplot.close
+if keyword_set(ps) then v_acc_hist,v,acc,/ps,bpath=bpath
+if keyword_set(png) then v_acc_hist,v,acc,/png,bpath=bpath
 
-;;plot soure region
 if not keyword_set(nosr) then begin
-r_sun=1625.5946 ;from sdo data index
-if keyword_set(png) then begin
-  set_plot,'z'
-  device,SET_RESOLUTION=[800,900],decomposed=0
-  bground=!p.background
-  bcolor=!p.color
-  !p.background='FFFFFF'xl
-  !p.color='000000'xl
-endif
-if keyword_set(ps) then begin
-  set_plot,'ps'
-  device,filename=bpath+'result_image/source_region.eps',/color,xs=24,ys=30,ENCAPSULATED=1
+  if keyword_set(ps) then source_region,lat,lon,/ps,bpath=bpath
+  if keyword_set(png) then source_region,lat,lon,/png,bpath=bpath
 endif
 
-!p.multi=[0,2,1]
-data=fltarr(4096,4096)
-contour,data,xtickformat='(A6)',ytickformat='(A6)',xstyle=1,ystyle=1,position=[0.10,0.37,0.99,0.8],title='Source Region of CMEs'
-n=401
-theta=findgen(n)*2*!pi/(n-1)
-xy=fltarr(2,n)
-xy[0,*]=sin(theta)*r_sun+2048
-xy[1,*]=cos(theta)*r_sun+2048
-plots,xy,color=fsc_color('red')
+if keyword_set(ps) then v_others,start,arrive,v,han,/ps,bpath=bpath
+if keyword_set(png) then v_others,start,arrive,v,han,/png,bpath=bpath
 
-lat1=lat
-lon1=lon
-for i=0l,n_elements(lat)-1 do begin
-  if abs(lon1[i]) gt 90 then begin
-    lon1[i]=(180-abs(lon1[i]))*lon1[i]/abs(lon1[i]) ;backward
-    color1='blue'
-  endif else begin
-    color1='green'
-  endelse
-
-  xlon=2048+r_sun*cos(lat1[i]*!dtor)*sin(lon1[i]*!dtor)
-  ylat=2048+sin(lat1[i]*!dtor)*r_sun
-  plots,xlon,ylat,color=fsc_color(color1),psym=1
-endfor
-
-loadct,0l
-xyouts,0.55,0.40,'Green + --Front of The Solar Disk',/normal,ALIGNMENT=0.5
-xyouts,0.55,0.38,'Blue  + --Back of The Solar Disk',/normal,ALIGNMENT=0.5
-
-maxlat=max(lat)
-minlat=min(lat)
-l=indgen(361)-180
-m=replicate(1,n_elements(l))
-for i=0l,n_elements(lat)-1 do begin
-  if i eq 0l then begin
-    plot,lon,lat,/nodata,xrange=[-180,180],yrange=[-90,90],xstyle=1,ystyle=1,position=[0.10,0.1,0.99,0.35],xtitle='Longitude',ytitle='Latitude'
-    plots,lon[i],lat[i],psym=1,color=fsc_color('green')
-  endif else begin
-    plots,lon[i],lat[i],psym=1,color=fsc_color('green')
-  endelse
-endfor
-oplot,l,m*maxlat,color=fsc_color('black'),psym=3
-oplot,l,m*minlat,color=fsc_color('black'),psym=3
-!p.multi=0
-loadct,0l
-if keyword_set(png) then begin
-  a=tvrd(/true)
-  name=bpath+'result_image/source_region.png'
-  write_image,name,"png",a,r,g,b
-  !p.background=bground
-  !p.color=bcolor
-  device,/close
-  set_plot,'x'
-endif
-if keyword_set(ps) then begin
-  device,/close
-  set_plot,'x'
-endif
-endif
 end
