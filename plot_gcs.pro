@@ -135,8 +135,8 @@ v=[v,para1[loc].v]
 han=[han,para1[loc].an/2.]
 start=[start,strmid(para1[loc].Date,0,4)+'/'+strmid(para1[loc].Date,4,2)+'/'+strmid(para1[loc].Date,6,2)+' '+para1[loc].Time]
 
-if keyword_set(ps) then v_acc_hist,v,acc,/ps,bpath=bpath
-if keyword_set(png) then v_acc_hist,v,acc,/png,bpath=bpath
+if keyword_set(ps) then v_acc_hist,v,acc,lat,/ps,bpath=bpath
+if keyword_set(png) then v_acc_hist,v,acc,lat,/png,bpath=bpath
 
 if not keyword_set(nosr) then begin
   if keyword_set(ps) then source_region,lat,lon,/ps,bpath=bpath

@@ -20,7 +20,7 @@ pro v_others,start,arrive,v,han,ps=ps,png=png,bpath=bpath
     v_other.SYM_COLOR='r'
     re=replicate(1,100)
     au=149597871l
-    v_other=plot(v1,v1*arrive2*60.*60*24/au,/curr,xtitle='Velocity(km.s!E-1!N)',ytitle='Velocity*Arrive Time/1AU',position=[0.1,0.1,0.95,0.39],linestyle='',symbol='+',sym_color='r')
+    v_other=plot(v1,v1*arrive2*60.*60*24/au,/curr,xtitle='Velocity(km.s!E-1!N)',ytitle='Velocity*Arrive Time(AU)',position=[0.1,0.1,0.95,0.39],linestyle='',symbol='+',sym_color='r')
     v_other=plot(indgen(100)*25,re,/curr,/overplot,'b.')
     if keyword_set(ps) then v_other.save,bpath+'result_image/v_others.eps',resolution=512,/transparent
     if keyword_set(png) then v_other.save,bpath+'result_image/v_others.png',resolution=512,/transparent
