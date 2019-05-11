@@ -40,7 +40,7 @@ lon=[]
 v=[] ;velocity
 acc=[] ;acceleration
 han=[] ;half angle
-back=''
+rat=[]
 
 ;read data from Prof. Shen
 fmt1='(a8,1x,a8,1x,f3,1x,f3,1x,f3,1x,f4)'
@@ -112,9 +112,26 @@ for d=0,n_elements(date)-1 do begin
   v=[v,coeff[1]]
   acc=[acc,2*fit_result[0,2]]
   han=[han,average(para.han)]
+  rat=[rat,average(para.rat)]
+;  if d eq 26 then begin
+;  print,para[0]
+;  print,(para[0].lon/!dtor-tim2carr(start[d]))*!dtor
+;  endif
 endfor
 lat=lat/!dtor
-lon=lon/!dtor-168.103
+lon=lon/!dtor
+han=han+asin(rat)
+han=han/!dtor
+L0=tim2carr(start)
+for i=0,n_elements(lon)-1 do begin
+  if lon[i]-L0[i] gt 0 then begin
+    lon[i]=lon[i]-L0[i]
+  endif else begin
+    lon[i]=lon[i]-L0[i]+360
+  endelse
+endfor
+loc=where(lon gt 180)
+lon(loc)=lon(loc)-360
 lat=[lat,para1.lat]
 lon=[lon,para1.lon]
 loc=where(para1.v gt 0)
@@ -122,15 +139,34 @@ v=[v,para1[loc].v]
 han=[han,para1[loc].an/2.]
 start=[start,strmid(para1[loc].Date,0,4)+'/'+strmid(para1[loc].Date,4,2)+'/'+strmid(para1[loc].Date,6,2)+' '+para1[loc].Time]
 
-if keyword_set(ps) then v_acc_hist,v,acc,/ps,bpath=bpath
-if keyword_set(png) then v_acc_hist,v,acc,/png,bpath=bpath
+path3=findfile(bpath+'vcdaw.txt')
+openr,lun,path3,/get_lun
+nline3=3l
+nline3=file_lines(path3)
+fmt2='(a19,7x,f)'
+info2={TIME:'',Vcdaw:0.0}
+para2=replicate(info2,nline3)
+nrecords3=0L
+while(nrecords3 ne nline3) do begin
+  readf,lun,info2,format=fmt2
+  para2[nrecords3]=info2
+  nrecords3=nrecords3+1L
+endwhile
+free_lun,lun
 
-if not keyword_set(nosr) then begin
-  if keyword_set(ps) then source_region,lat,lon,/ps,bpath=bpath
-  if keyword_set(png) then source_region,lat,lon,/png,bpath=bpath
-endif
-
-if keyword_set(ps) then v_others,start,arrive,v,han,/ps,bpath=bpath
-if keyword_set(png) then v_others,start,arrive,v,han,/png,bpath=bpath
+  if keyword_set(ps) then begin
+    if not keyword_set(nosr) then source_region,lat,lon,/ps,bpath=bpath
+    v_acc_hist,v,acc,lat,/ps,bpath=bpath
+    v_others,start,arrive,v,han,/ps,bpath=bpath
+    loc=where(para2.vcdaw gt 0)
+    vcdaw_others,v(loc),para2(loc).vcdaw,lat,lon,/ps,bpath=bpath
+  endif
+  if keyword_set(png) then begin
+    if not keyword_set(nosr) then source_region,lat,lon,/png,bpath=bpath
+    v_acc_hist,v,acc,lat,/png,bpath=bpath
+    v_others,start,arrive,v,han,/png,bpath=bpath
+    loc=where(para2.vcdaw gt 0)
+    vcdaw_others,v(loc),para2(loc).vcdaw,lat(loc),lon(loc),/png,bpath=bpath
+  endif
 
 end
