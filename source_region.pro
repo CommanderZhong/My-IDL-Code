@@ -19,35 +19,50 @@ pro source_region,lat,lon,png=png,ps=ps,bpath=bpath
 
     !p.multi=[0,2,1]
     data=fltarr(4096,4096)
-    contour,data,xtickformat='(A6)',ytickformat='(A6)',xstyle=1,ystyle=1,position=[0.10,0.37,0.99,0.8],title='Source Region of CMEs'
+    contour,data,xtickformat='(A6)',ytickformat='(A6)',xstyle=1,ystyle=1,position=[0.15,0.35,0.9,0.9];,title='Source Region of CMEs'
     n=401
     theta=findgen(n)*2*!pi/(n-1)
     xy=fltarr(2,n)
     xy[0,*]=sin(theta)*r_sun+2048
     xy[1,*]=cos(theta)*r_sun+2048
-    plots,xy,color=fsc_color('red')
+    plots,xy,color=fsc_color('black')
     lin=(indgen(101)-50)/50.*r_sun+2048
-    oplot,lin,replicate(2048,n_elements(lin)),color=fsc_color('red'),linestyle=2
-    oplot,replicate(2048,n_elements(lin)),lin,color=fsc_color('red'),linestyle=2
+    oplot,lin,replicate(2048,n_elements(lin)),color=fsc_color('black'),linestyle=2
+    oplot,replicate(2048,n_elements(lin)),lin,color=fsc_color('black'),linestyle=2
+    for i=-80,80,10 do begin
+      latx=indgen(51)*180./50-90
+      xx=2048+r_sun*cos(latx*!dtor)*sin(i*!dtor)
+      yy=2048+sin(latx*!dtor)*r_sun
+      plots,xx,yy,linestyle=2
+    endfor
+    for i=-80,80,10 do begin
+      lonx=indgen(51)*180./50-90
+      xx=2048+r_sun*cos(i*!dtor)*sin(lonx*!dtor)
+      yy=2048+sin(i*!dtor)*r_sun
+      plots,xx,yy,linestyle=2
+    endfor
 
     lat1=lat
     lon1=lon
     for i=0l,n_elements(lat)-1 do begin
       if abs(lon1[i]) gt 90 then begin
         lon1[i]=(180-abs(lon1[i]))*lon1[i]/abs(lon1[i]) ;backward
-        color1='green'
+        color1='green
       endif else begin
         color1='blue'
       endelse
 
       xlon=2048+r_sun*cos(lat1[i]*!dtor)*sin(lon1[i]*!dtor)
       ylat=2048+sin(lat1[i]*!dtor)*r_sun
-      plots,xlon,ylat,color=fsc_color(color1),psym=1
+      plots,xlon,ylat,color=fsc_color(color1),psym=4
     endfor
 
-    xyouts,0.55,0.40,'Blue + --Front of The Solar Disk',/normal,ALIGNMENT=0.5,color=fsc_color('blue')
-    xyouts,0.55,0.38,'Green  + --Back of The Solar Disk',/normal,ALIGNMENT=0.5,color=fsc_color('green')
+    plots,1200,280,color=fsc_color('blue'),psym=4
+    plots,1200,130,color=fsc_color('green'),psym=4
     loadct,0l
+    xyouts,2048,250,'->Front of The Solar Disk',ALIGNMENT=0.5
+    xyouts,2048,100,'->Back of The Solar Disk',ALIGNMENT=0.5
+    
 
     maxlat=max(lat)
     minlat=min(lat)
@@ -57,7 +72,7 @@ pro source_region,lat,lon,png=png,ps=ps,bpath=bpath
     my=replicate(1,n_elements(ly))
     for i=0l,n_elements(lat)-1 do begin
       if i eq 0l then begin
-        plot,lon,lat,/nodata,xrange=[-180,180],yrange=[-90,90],xstyle=1,ystyle=1,position=[0.10,0.1,0.99,0.35],xtitle='Longitude',ytitle='Latitude'
+        plot,lon,lat,/nodata,xrange=[-180,180],yrange=[-90,90],xstyle=1,ystyle=1,position=[0.10,0.1,0.99,0.34],xtitle='!4w!3(!Eo!N)',ytitle='!7h!3(!Eo!N)'
         plots,lon[i],lat[i],psym=1,color=fsc_color('blue')
       endif else begin
         plots,lon[i],lat[i],psym=1,color=fsc_color('blue')
@@ -89,20 +104,27 @@ pro source_region,lat,lon,png=png,ps=ps,bpath=bpath
     
     binsize2=(max(lat)-min(lat))/10.
     lathist=histogram(lat,BINSIZE=binsize2,locations=binvals2)
-    histplot1=barplot(binvals2,lathist,ytitle='Num(#)',xtitle='Latitude(!Eo!N)')
+    histplot1=barplot(binvals2,lathist,ytitle='Num(#)',xtitle='$\theta (\deg)$')
     ;histplot1=plot(binvals2,lathist,/overplot)
-    text3=text(binvals2,lathist+0.1,strmid(string(binvals2),5,7),/data,color='red',alignment=0.5)
+    ;text3=text(binvals2,lathist+0.1,strmid(string(binvals2),5,7),/data,color='red',alignment=0.5)
     if keyword_set(ps) then histplot1.save,bpath+'result_image/lathist.eps',resolution=512,/transparent
     if keyword_set(png) then histplot1.save,bpath+'result_image/lathist.png',resolution=512,/transparent
     histplot1.close
     
-    omega=acos(cos(lat*!dtor)*cos(lon*!dtor))/!dtor
-    binsize3=(max(omega)-min(omega))/10.
-    omghist=histogram(omega,BINSIZE=binsize3,locations=binvals3)
-    histplot2=barplot(binvals3,omghist,ytitle='Num(#)',xtitle='$\omega $(!Eo!N)')
+    epsilon=acos(cos(lat*!dtor)*cos(lon*!dtor))/!dtor
+    binsize3=(max(epsilon)-min(epsilon))/10.
+    epshist=histogram(epsilon,BINSIZE=binsize3,locations=binvals3)
+    histplot2=barplot(binvals3,epshist,ytitle='Num(#)',xtitle='$\epsilon (\deg)$')
     ;histplot2=plot(binvals3,omghist,/overplot)
-    text3=text(binvals3,omghist+0.1,strmid(string(binvals3),5,6),/data,color='red',alignment=0.5)
-    if keyword_set(ps) then histplot2.save,bpath+'result_image/omghist.eps',resolution=512,/transparent
-    if keyword_set(png) then histplot2.save,bpath+'result_image/omghist.png',resolution=512,/transparent
+    ;text3=text(binvals3,epshist+0.1,strmid(string(binvals3),5,6),/data,color='red',alignment=0.5)
+    if keyword_set(ps) then histplot2.save,bpath+'result_image/epshist.eps',resolution=512,/transparent
+    if keyword_set(png) then histplot2.save,bpath+'result_image/epshist.png',resolution=512,/transparent
     histplot2.close
+    
+    binsize4=(max(lon)-min(lon))/10.
+    lonhist=histogram(lon,BINSIZE=binsize4,locations=binvals4)
+    histplot3=barplot(binvals4,lonhist,ytitle='Num(#)',xtitle='$\phi (\deg)$')
+    if keyword_set(ps) then histplot3.save,bpath+'result_image/lonhist.eps',resolution=512,/transparent
+    if keyword_set(png) then histplot3.save,bpath+'result_image/lonhist.png',resolution=512,/transparent
+    histplot3.close
 end

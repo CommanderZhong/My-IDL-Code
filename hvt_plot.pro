@@ -54,13 +54,13 @@ pro hvt_plot,time,Hight,head,num,ps=ps,png=png,bpath=bpath,degree=degree,date=da
   !p.charsize=1.0
   !p.multi=[0,2,1]
   loadct,0l
-  utplot,time,Hight,head,/nodata,xstyle=1,ytitle='Hight(km)',position=[0.10,0.57,0.99,0.9],xtickformat='(A6)',xtitle='',title='Hight/Velocity-Time Image'
+  utplot,time,Hight,head,/nodata,xstyle=1,ytitle='Hight(km)',position=[0.10,0.57,0.99,0.9],xtickformat='(A6)',xtitle='';,title='Hight/Velocity-Time Image'
   oplot,time,Hight,psym=7,color=fsc_color('red')
   oplot,time1,H_fit,color=fsc_color('blue')
   oplot,time1,H_linfit,color=fsc_color('green'),linestyle=2
   xyouts,0.12,0.62,H_function,color=fsc_color('green'),/normal,CHARSIZE=0.9
   loadct,0l
-  utplot,time1,V_fit,head,/nodata,xstyle=1,yrange=[min(V_fit)-100,max(V_fit)+100],ystyle=1,ytitle='Velocity(km*s!E-1!N)',position=[0.10,0.1,0.99,0.55];,titile='Velocity-TIme Image'
+  utplot,time1,V_fit,head,/nodata,xstyle=1,yrange=[min(V_fit)-100,max(V_fit)+100],ystyle=1,ytitle='V!IGCS!N(km*s!E-1!N)',position=[0.10,0.1,0.99,0.55];,titile='Velocity-TIme Image'
   oplot,time1,V_fit,color=fsc_color('blue')
   oplot,time1,replicate(coeff[1],npoints),color=fsc_color('green'),linestyle=2
   xyouts,0.12,0.15,V_function,color=fsc_color('green'),/normal,CHARSIZE=0.9
