@@ -41,6 +41,7 @@ v=[] ;velocity
 acc=[] ;acceleration
 han=[] ;half angle
 rat=[]
+rotat=[]
 
 ;read data from Prof. Shen
 fmt1='(a8,1x,a8,1x,f3,1x,f3,1x,f3,1x,f4)'
@@ -79,7 +80,7 @@ endwhile
 free_lun,lun
 
 start=strarr(n_elements(date))  ;start time of observed CME
-
+;openw,lun1,bpath+'dd.txt',/get_lun
 for d=0,n_elements(date)-1 do begin
   path=findfile(bpath+'result/'+date[d]+'/*.txt')
   openr,lun,path,/get_lun
@@ -113,13 +114,17 @@ for d=0,n_elements(date)-1 do begin
   acc=[acc,2*fit_result[0,2]]
   han=[han,average(para.han)]
   rat=[rat,average(para.rat)]
-;  if d eq 26 then begin
-;  print,para[0]
-;  print,(para[0].lon/!dtor-tim2carr(start[d]))*!dtor
-;  endif
+  rotat=[rotat,para[0].rot]
+  
+;  if para[0].han gt 0.5 then begin
+;   
+;  printf,lun1,start[d],(para[0].lon/!dtor-tim2carr(start[d]))*!dtor,para[0].lat,para[0].rot,para[0].han,para[0].rat
+;  endif  
 endfor
+;free_lun,lun1
 lat=lat/!dtor
 lon=lon/!dtor
+rotat=rotat/!dtor
 han=han+asin(rat)
 han=han/!dtor
 L0=tim2carr(start)
@@ -132,9 +137,12 @@ for i=0,n_elements(lon)-1 do begin
 endfor
 loc=where(lon gt 180)
 lon(loc)=lon(loc)-360
-lat=[lat,para1.lat]
-lon=[lon,para1.lon]
+;lat=[lat,para1.lat]
+;lon=[lon,para1.lon]
 loc=where(para1.v gt 0)
+lat=[lat,para1[loc].lat]
+lon=[lon,para1[loc].lon]
+rotat=[rotat,replicate(91,num1-1)]
 v=[v,para1[loc].v]
 han=[han,para1[loc].an/2.]
 start=[start,strmid(para1[loc].Date,0,4)+'/'+strmid(para1[loc].Date,4,2)+'/'+strmid(para1[loc].Date,6,2)+' '+para1[loc].Time]
@@ -152,6 +160,13 @@ while(nrecords3 ne nline3) do begin
   para2[nrecords3]=info2
   nrecords3=nrecords3+1L
 endwhile
+free_lun,lun
+
+openw,lun,bpath+'table.txt',/get_lun
+record=n_elements(v)
+for i=0,record-1 do begin
+  printf,lun,start[i],lon[i],lat[i],rotat[i],han[i],v[i],para2[i].vcdaw
+endfor
 free_lun,lun
 
   if keyword_set(ps) then begin
