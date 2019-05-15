@@ -1,4 +1,4 @@
-pro source_region,lat,lon,png=png,ps=ps,bpath=bpath
+pro source_region,lat,lon,png=png,ps=ps,bpath=bpath,epsilon=epsilon
 
   ;;plot soure region
 
@@ -16,6 +16,11 @@ pro source_region,lat,lon,png=png,ps=ps,bpath=bpath
       set_plot,'ps'
       device,filename=bpath+'result_image/source_region.eps',/color,xs=24,ys=30,ENCAPSULATED=1
     endif
+    thick=!p.thick
+    charthick=!p.charthick
+    charsize=!p.charsize
+    !p.thick=4
+    !p.charthick=3
 
     !p.multi=[0,2,1]
     data=fltarr(4096,4096)
@@ -57,13 +62,16 @@ pro source_region,lat,lon,png=png,ps=ps,bpath=bpath
       plots,xlon,ylat,color=fsc_color(color1),psym=4
     endfor
 
-    plots,1200,280,color=fsc_color('blue'),psym=4
-    plots,1200,130,color=fsc_color('green'),psym=4
+    plots,1400,280,color=fsc_color('blue'),psym=4
+    plots,1400,130,color=fsc_color('green'),psym=4
     loadct,0l
+    xyouts,2048,3800,'Solar Disk',ALIGNMENT=0.5,charsize=1.8
     xyouts,2048,250,'->Front of The Solar Disk',ALIGNMENT=0.5
     xyouts,2048,100,'->Back of The Solar Disk',ALIGNMENT=0.5
+    xyouts,2040,2040,'0!Eo!N',ALIGNMENT=0.5,charsize=1.2,charthick=1.5,color=fsc_color('red')
+    loadct,0l
     
-
+    !p.charsize=1.5
     maxlat=max(lat)
     minlat=min(lat)
     lx=indgen(361)-180
@@ -82,12 +90,16 @@ pro source_region,lat,lon,png=png,ps=ps,bpath=bpath
     oplot,lx,mx*minlat,color=fsc_color('red'),linestyle=2
     oplot,-90*my,ly,color=fsc_color('red'),linestyle=2
     oplot,90*my,ly,color=fsc_color('red'),linestyle=2
-    xyouts,-150,maxlat+2,string(maxlat),color=fsc_color('red')
-    xyouts,-150,minlat-10,string(minlat),color=fsc_color('red')
-    xyouts,-105,0,'-90',color=fsc_color('red')
+    xyouts,-150,maxlat+2,strmid(string(maxlat),6,5),color=fsc_color('red')
+    xyouts,-150,minlat-10,strmid(string(minlat),5,6),color=fsc_color('red')
+    xyouts,-110,0,'-90',color=fsc_color('red')
     xyouts,92,0,'90',color=fsc_color('red')
     !p.multi=0
     loadct,0l
+    
+    !p.thick =thick
+    !p.charthick=charthick
+    !p.charsize=charsize
     if keyword_set(png) then begin
       a=tvrd(/true)
       name=bpath+'result_image/source_region.png'
@@ -104,7 +116,7 @@ pro source_region,lat,lon,png=png,ps=ps,bpath=bpath
     
     binsize2=(max(lat)-min(lat))/10.
     lathist=histogram(lat,BINSIZE=binsize2,locations=binvals2)
-    histplot1=barplot(binvals2,lathist,ytitle='Num(#)',xtitle='$\theta (\deg)$')
+    histplot1=barplot(binvals2,lathist,ytitle='Num(#)',xtitle='$\theta(!Eo!N)$',position=[0.1,0.11,0.99,0.99],font_size=20)
     ;histplot1=plot(binvals2,lathist,/overplot)
     ;text3=text(binvals2,lathist+0.1,strmid(string(binvals2),5,7),/data,color='red',alignment=0.5)
     if keyword_set(ps) then histplot1.save,bpath+'result_image/lathist.eps',resolution=512,/transparent
@@ -114,16 +126,16 @@ pro source_region,lat,lon,png=png,ps=ps,bpath=bpath
     epsilon=acos(cos(lat*!dtor)*cos(lon*!dtor))/!dtor
     binsize3=(max(epsilon)-min(epsilon))/10.
     epshist=histogram(epsilon,BINSIZE=binsize3,locations=binvals3)
-    histplot2=barplot(binvals3,epshist,ytitle='Num(#)',xtitle='$\epsilon (\deg)$')
+    histplot2=barplot(binvals3,epshist,ytitle='Num(#)',xtitle='$\epsilon(!Eo!N)$',position=[0.1,0.11,0.99,0.99],font_size=20)
     ;histplot2=plot(binvals3,omghist,/overplot)
     ;text3=text(binvals3,epshist+0.1,strmid(string(binvals3),5,6),/data,color='red',alignment=0.5)
     if keyword_set(ps) then histplot2.save,bpath+'result_image/epshist.eps',resolution=512,/transparent
     if keyword_set(png) then histplot2.save,bpath+'result_image/epshist.png',resolution=512,/transparent
     histplot2.close
-    
+
     binsize4=(max(lon)-min(lon))/10.
     lonhist=histogram(lon,BINSIZE=binsize4,locations=binvals4)
-    histplot3=barplot(binvals4,lonhist,ytitle='Num(#)',xtitle='$\phi (\deg)$')
+    histplot3=barplot(binvals4,lonhist,ytitle='Num(#)',xtitle='$\phi(!Eo!N)$',position=[0.1,0.11,0.99,0.99],font_size=20)
     if keyword_set(ps) then histplot3.save,bpath+'result_image/lonhist.eps',resolution=512,/transparent
     if keyword_set(png) then histplot3.save,bpath+'result_image/lonhist.png',resolution=512,/transparent
     histplot3.close

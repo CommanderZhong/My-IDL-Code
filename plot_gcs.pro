@@ -125,6 +125,7 @@ endfor
 lat=lat/!dtor
 lon=lon/!dtor
 rotat=rotat/!dtor
+
 han=han+asin(rat)
 han=han/!dtor
 L0=tim2carr(start)
@@ -170,18 +171,18 @@ endfor
 free_lun,lun
 
   if keyword_set(ps) then begin
-    if not keyword_set(nosr) then source_region,lat,lon,/ps,bpath=bpath
+    if not keyword_set(nosr) then source_region,lat,lon,/ps,bpath=bpath,epsilon=epsilon
     v_acc_hist,v,acc,lat,/ps,bpath=bpath
-    v_others,start,arrive,v,han,/ps,bpath=bpath
+    v_others,start,arrive,v,han,/ps,bpath=bpath,epsilon=epsilon
     loc=where(para2.vcdaw gt 0)
     vcdaw_others,v(loc),para2(loc).vcdaw,lat,lon,/ps,bpath=bpath
   endif
   if keyword_set(png) then begin
-    if not keyword_set(nosr) then source_region,lat,lon,/png,bpath=bpath
+    if not keyword_set(nosr) then source_region,lat,lon,/png,bpath=bpath,epsilon=epsilon
     v_acc_hist,v,acc,lat,/png,bpath=bpath
-    v_others,start,arrive,v,han,/png,bpath=bpath
+    v_others,start,arrive,v,han,/png,bpath=bpath,epsilon=epsilon
     loc=where(para2.vcdaw gt 0)
     vcdaw_others,v(loc),para2(loc).vcdaw,lat(loc),lon(loc),/png,bpath=bpath
   endif
-
+vvv
 end
