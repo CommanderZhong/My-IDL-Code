@@ -10,6 +10,8 @@ pro v_others,start,arrive,v,han,ps=ps,png=png,bpath=bpath,epsilon=epsilon
   han=han(loc)
   
   coeff1=linfit(v1,han)
+  cc=correlate(v1,han)
+
   npoint=101l
   vn=lindgen(npoint)*2500/(npoint-1)
   han_fit=coeff1[0]+coeff1[1]*vn
@@ -27,9 +29,10 @@ pro v_others,start,arrive,v,han,ps=ps,png=png,bpath=bpath,epsilon=epsilon
     v_other.SYM_COLOR='r'
     v_other.font_size=18
     resultx=comfit(v1,arrive2,[0,6e-4],/double,/HYPERBOLIC)
+    cc1=correlate(v1,arrive2)
     t_fit=1./(resultx[0]+resultx[1]*vn)
-
     v_other=plot(vn,t_fit,/curr,/overplot,'g-.')
+    text0=text(0.7,0.9,'LCC='+strmid(string(cc1),5,6),/normal,font_size=20)
     re=replicate(1,100)
     v_other=plot(v1,v1*arrive2*60.*60*24/au,/curr,xrange=[100,2200],xtitle='V!IGCS!N(km.s!E-1!N)',ytitle='D!Ipro!N(AU)',position=[0.11,0.11,0.97,0.49],linestyle='',symbol='+',sym_color='r')
     v_other.font_size=18
@@ -48,6 +51,7 @@ pro v_others,start,arrive,v,han,ps=ps,png=png,bpath=bpath,epsilon=epsilon
   v_han.SYM_COLOR='r'
   v_han.font_size=20
   v_han=plot(vn,han_fit,/curr,/overplot,'b.')
+  text0=text(0.8,0.9,'CC='+strmid(string(cc),6,5),/normal,font_color='blue')
   if keyword_set(ps) then v_han.save,bpath+'result_image/v_han.eps',resolution=512,/transparent
   if keyword_set(png) then v_han.save,bpath+'result_image/v_han.png',resolution=512,/transparent
   v_han.close
