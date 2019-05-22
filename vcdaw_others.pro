@@ -3,19 +3,19 @@ pro vcdaw_others,v,vcdaw,lat,lon,ps=ps,png=png,bpath=bpath
     project=v/vcdaw
 ;    print,n_elements(where((project lt 1.2) and (project gt 0.8))),n_elements(project)
 ;    print,n_elements(where((project lt 1.5) and (project gt 0.)))
-    bsize=(max(project)-min(project))/10.
-    prohist=histogram(project,BINSIZE=bsize,locations=binvals)
+    bsize=0.2
+    prohist=histogram(project,min=0.6,BINSIZE=bsize,locations=binvals)
     npoint=101l
     n1=replicate(0.8,npoint)
     n2=replicate(1.2,npoint)
-    vcdawp=barplot(binvals,prohist,xtickformat='(A6)',xrange=[0.3,3.0],ytitle='Num(#)',POSITION=[0.1,0.86,0.97,0.99])
-    vcdawp=plot(project,lat,/curr,POSITION=[0.1,0.61,0.97,0.84],xrange=[0.3,3.0],ytitle='$\theta (!Eo!N)$',xtickformat='(A6)')
+    vcdawp=barplot(binvals,prohist,xtickformat='(A6)',xrange=[0.5,2.8],ytitle='Num(#)',POSITION=[0.1,0.86,0.97,0.99])
+    vcdawp=plot(project,lat,/curr,POSITION=[0.1,0.61,0.97,0.84],xrange=[0.5,2.8],ytitle='$\theta (!Eo!N)$',xtickformat='(A6)')
     vcdawp.SYMBOL='+'
     vcdawp.LINESTYLE=''
     vcdawp.SYM_COLOR='r'
     vcdawp=plot(n1,indgen(npoint)-40,'b--',/curr,/overplot)
     vcdawp=plot(n2,indgen(npoint)-40,'b--',/curr,/overplot)
-    vcdawp=plot(project,lon,/curr,POSITION=[0.1,0.35,0.97,0.59],xrange=[0.3,3.0],ytitle='$\phi (!Eo!N)$',xtickformat='(A6)')
+    vcdawp=plot(project,lon,/curr,POSITION=[0.1,0.35,0.97,0.59],xrange=[0.5,2.8],ytitle='$\phi (!Eo!N)$',xtickformat='(A6)')
     vcdawp.SYMBOL='d'
     vcdawp.LINESTYLE=''
     vcdawp.SYM_COLOR='r'
@@ -23,7 +23,7 @@ pro vcdaw_others,v,vcdaw,lat,lon,ps=ps,png=png,bpath=bpath
     vcdawp=plot(n2,indgen(npoint)*2.5-150,'b--',/curr,/overplot)
    
     epsilon=acos(cos(lat*!dtor)*cos(lon*!dtor))/!dtor
-    vcdawp=plot(project,epsilon,/curr,POSITION=[0.1,0.1,0.97,0.33],xrange=[0.3,3.0],ytitle='$\epsilon (!Eo!N)$',xtitle='PE!Iv!N')
+    vcdawp=plot(project,epsilon,/curr,POSITION=[0.1,0.1,0.97,0.33],xrange=[0.5,2.8],ytitle='$\epsilon (!Eo!N)$',xtitle='PE!Iv!N')
     vcdawp.SYMBOL='o'
     vcdawp.LINESTYLE=''
     vcdawp.SYM_COLOR='r'
