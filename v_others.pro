@@ -36,9 +36,8 @@ pro v_others,start,arrive,v,han,ps=ps,png=png,bpath=bpath,epsilon=epsilon
     re=replicate(1,100)
     v_other=plot(v1,v1*arrive2*60.*60*24/au,/curr,xrange=[100,2200],xtitle='V!IGCS!N(km.s!E-1!N)',ytitle='D!Ipro!N(AU)',position=[0.11,0.11,0.97,0.49],linestyle='',symbol='+',sym_color='r')
     v_other.font_size=18
-    ;print,v1(where(v1*arrive2*60.*60*24/au gt 1)),n_elements(v1(where(v1*arrive2*60.*60*24/au gt 1)))
-    ;pmm,v1(where(v1*arrive2*60.*60*24/au gt 1))
-    v_other=plot(indgen(100)*25,re,/curr,/overplot,'b.')
+    
+    ;v_other=plot(indgen(100)*25,re,/curr,/overplot,'b.')
     ;v_other=plot(vn,d_fit,/curr,/overplot,'g-.')
     ;text1=text(1600,2.8,string(coeff3[1]),/data,color='green',alignment=0.5,font_size=20)
     if keyword_set(ps) then v_other.save,bpath+'result_image/v_others.eps',resolution=512,/transparent
@@ -56,8 +55,6 @@ pro v_others,start,arrive,v,han,ps=ps,png=png,bpath=bpath,epsilon=epsilon
   if keyword_set(png) then v_han.save,bpath+'result_image/v_han.png',resolution=512,/transparent
   v_han.close
   
-  
-  
   npoint=101l
   eps0=indgen(npoint)*120./(npoint-1)
   aneps=plot(epsilon,han,position=[0.12,0.11,0.97,0.99],yrange=[10,100],xtitle='$\epsilon $(!Eo!N)',ytitle='$\omega $(!Eo!N)',font_size=20)
@@ -69,4 +66,33 @@ pro v_others,start,arrive,v,han,ps=ps,png=png,bpath=bpath,epsilon=epsilon
   if keyword_set(ps) then aneps.save,bpath+'result_image/aneps.eps',resolution=512,/transparent
   if keyword_set(png) then aneps.save,bpath+'result_image/aneps.png',resolution=512,/transparent
   aneps.close
+  
+  loc=where(sin(epsilon*!dtor) lt sin(han*!dtor))
+  eps1=epsilon(loc)*!dtor
+  han1=han(loc)*!dtor
+  ;tpr=arrive2*24
+  v2=v1(loc)
+  d_r=solve_equation(eps1,han1)
+
+  coeff3=linfit(v2,d_r)
+  cc2=correlate(v2,d_r)
+  ;n=where(((v2 gt 2000) or ((v2 gt 1000) and (d_r lt 1.2))),complement=loc1)
+  ;coeff4=linfit(v2(loc1),d_r(loc1))
+  ;cc3=correlate(v2(loc1),d_r(loc1))
+  vfit=indgen(2201)
+  dfit=coeff3[0]+coeff3[1]*vfit
+
+  ;dfit1=coeff4[0]+coeff4[1]*vfit
+  
+  dv=plot(v2,d_r,font_size=20,xrange=[0,2100],yrange=[0.8,2],xtitle='V!IGCS!N(km.s!E-1!N )',ytitle='D!Irl!N(AU)',position=[0.11,0.11,0.97,0.99])
+  dv.symbol='o'
+  dv.linestyle=''
+  dv.sym_color='r'
+  dv=plot(vfit,dfit,/curr,/overplot,'b--')
+  ;dv=plot(vfit,dfit1,/curr,/overplot,'g-.')
+  text0=text(0.2,0.9,'CC='+strmid(string(cc2),6,5),/normal,font_size=20,color='blue')
+  ;text0=text(0.2,0.8,'CC2='+strmid(string(cc3),6,5),/normal,font_size=20,color='green')
+  if keyword_set(ps) then dv.save,bpath+'result_image/dv.eps',resolution=512,/transparent
+  if keyword_set(png) then dv.save,bpath+'result_image/dv.png',resolution=512,/transparent
+  dv.close
 end

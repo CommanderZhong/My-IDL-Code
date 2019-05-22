@@ -9,7 +9,7 @@
 ; degree:the degree of polynomial fit of data,at least 2;with a
 ;        form of f(x)=x1+x2*x+x3*x^2+……
 ;Example:
-; plot_gcs,date='111001',/png,/nolist
+; plot_gcs,date=['111001'],/png,/nolist
 ; plot_gcs,/ps
 ;Log:
 ; v1.0  init                       Z.H.Zhong at 04/21/2019
@@ -23,7 +23,7 @@ pro plot_gcs,date=date,nosr=nosr,png=png,ps=ps,degree=degree,$
 
 bpath='/home/zhzhong/Desktop/mywork/work/'
 if keyword_set(nolist) then begin
-  if not keyword_set(date) then date='111001'
+  if not keyword_set(date) then date=['111001']
 endif else begin
   if not keyword_set(date) then begin
     spawn,'ls '+bpath+'result/',listing

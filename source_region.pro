@@ -24,7 +24,7 @@ pro source_region,lat,lon,png=png,ps=ps,bpath=bpath,epsilon=epsilon
 
     !p.multi=[0,2,1]
     data=fltarr(4096,4096)
-    contour,data,xtickformat='(A6)',ytickformat='(A6)',xstyle=1,ystyle=1,position=[0.15,0.35,0.9,0.9];,title='Source Region of CMEs'
+    contour,data,xtickformat='(A6)',ytickformat='(A6)',xstyle=1,ystyle=1,position=[0.17,0.35,0.88,0.9];,title='Source Region of CMEs'
     n=401
     theta=findgen(n)*2*!pi/(n-1)
     xy=fltarr(2,n)
@@ -116,7 +116,7 @@ pro source_region,lat,lon,png=png,ps=ps,bpath=bpath,epsilon=epsilon
     
     binsize2=(max(lat)-min(lat))/10.
     lathist=histogram(lat,BINSIZE=binsize2,locations=binvals2)
-    histplot1=barplot(binvals2,lathist,ytitle='Num(#)',xtitle='$\theta(!Eo!N)$',position=[0.1,0.11,0.99,0.99],font_size=20)
+    histplot1=barplot(binvals2,lathist,ytitle='Num(#)',xtitle='$\theta(!Eo!N)$',position=[0.1,0.11,0.98,0.99],font_size=20)
     ;histplot1=plot(binvals2,lathist,/overplot)
     ;text3=text(binvals2,lathist+0.1,strmid(string(binvals2),5,7),/data,color='red',alignment=0.5)
     if keyword_set(ps) then histplot1.save,bpath+'result_image/lathist.eps',resolution=512,/transparent
@@ -126,7 +126,7 @@ pro source_region,lat,lon,png=png,ps=ps,bpath=bpath,epsilon=epsilon
     epsilon=acos(cos(lat*!dtor)*cos(lon*!dtor))/!dtor
     binsize3=(max(epsilon)-min(epsilon))/10.
     epshist=histogram(epsilon,BINSIZE=binsize3,locations=binvals3)
-    histplot2=barplot(binvals3,epshist,ytitle='Num(#)',xtitle='$\epsilon(!Eo!N)$',position=[0.1,0.11,0.99,0.99],font_size=20)
+    histplot2=barplot(binvals3,epshist,ytitle='Num(#)',xtitle='$\epsilon(!Eo!N)$',position=[0.1,0.11,0.98,0.99],font_size=20)
     ;histplot2=plot(binvals3,omghist,/overplot)
     ;text3=text(binvals3,epshist+0.1,strmid(string(binvals3),5,6),/data,color='red',alignment=0.5)
     if keyword_set(ps) then histplot2.save,bpath+'result_image/epshist.eps',resolution=512,/transparent
@@ -135,7 +135,7 @@ pro source_region,lat,lon,png=png,ps=ps,bpath=bpath,epsilon=epsilon
 
     binsize4=(max(lon)-min(lon))/10.
     lonhist=histogram(lon,BINSIZE=binsize4,locations=binvals4)
-    histplot3=barplot(binvals4,lonhist,ytitle='Num(#)',xtitle='$\phi(!Eo!N)$',position=[0.1,0.11,0.99,0.99],font_size=20)
+    histplot3=barplot(binvals4,lonhist,ytitle='Num(#)',xtitle='$\phi(!Eo!N)$',position=[0.1,0.11,0.98,0.99],font_size=20)
     if keyword_set(ps) then histplot3.save,bpath+'result_image/lonhist.eps',resolution=512,/transparent
     if keyword_set(png) then histplot3.save,bpath+'result_image/lonhist.png',resolution=512,/transparent
     histplot3.close
