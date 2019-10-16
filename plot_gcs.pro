@@ -169,6 +169,12 @@ for i=0,record-1 do begin
   printf,lun,start[i],lon[i],lat[i],rotat[i],han[i],v[i],para2[i].vcdaw
 endfor
 free_lun,lun
+openw,lun,bpath+'acc.txt',/get_lun
+record1=n_elements(acc)
+for i=0,record1-1 do begin
+  printf,lun,start[i],acc[i]*1000
+endfor
+free_lun,lun
 
   if keyword_set(ps) then begin
     if not keyword_set(nosr) then source_region,lat,lon,/ps,bpath=bpath,epsilon=epsilon

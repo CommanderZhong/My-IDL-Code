@@ -1,14 +1,14 @@
 pro vcdaw_others,v,vcdaw,lat,lon,ps=ps,png=png,bpath=bpath
     
     project=v/vcdaw
-;    print,n_elements(where((project lt 1.2) and (project gt 0.8))),n_elements(project)
-;    print,n_elements(where((project lt 1.5) and (project gt 0.)))
+    ;print,n_elements(where((project lt 1.2) and (project gt 0.8))),n_elements(project)
+    ;print,n_elements(where((project gt 1.2) ))
     bsize=0.2
-    prohist=histogram(project,min=0.6,BINSIZE=bsize,locations=binvals)
+    prohist=histogram(project,min=0.4,BINSIZE=bsize,locations=binvals)
     npoint=101l
     n1=replicate(0.8,npoint)
     n2=replicate(1.2,npoint)
-    vcdawp=barplot(binvals,prohist,xtickformat='(A6)',xrange=[0.5,2.8],ytitle='Num(#)',POSITION=[0.1,0.86,0.97,0.99])
+    vcdawp=barplot(binvals,prohist,xtickformat='(A6)',xrange=[0.5,2.8],ytitle='Num(#)',POSITION=[0.1,0.86,0.97,0.99],/histogram)
     vcdawp=plot(project,lat,/curr,POSITION=[0.1,0.61,0.97,0.84],xrange=[0.5,2.8],ytitle='$\theta (!Eo!N)$',xtickformat='(A6)')
     vcdawp.SYMBOL='+'
     vcdawp.LINESTYLE=''

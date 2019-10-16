@@ -115,8 +115,8 @@ pro source_region,lat,lon,png=png,ps=ps,bpath=bpath,epsilon=epsilon
     endif
     
     binsize2=10
-    lathist=histogram(lat,Min=-30,Max=40,BINSIZE=binsize2,locations=binvals2)
-    histplot1=barplot(binvals2,lathist,ytitle='Num(#)',xtitle='$\theta(!Eo!N)$',position=[0.1,0.11,0.98,0.99],font_size=20,xrange=[-40,40])
+    lathist=histogram(lat,Min=-45,Max=45,BINSIZE=binsize2,locations=binvals2)
+    histplot1=barplot(binvals2,lathist,ytitle='Num(#)',xtitle='$\theta(!Eo!N)$',position=[0.1,0.11,0.98,0.99],font_size=20,xrange=[-40,50],/histogram)
     ;histplot1=plot(binvals2,lathist,/overplot)
     ;text3=text(binvals2,lathist+0.1,strmid(string(binvals2),5,7),/data,color='red',alignment=0.5)
     if keyword_set(ps) then histplot1.save,bpath+'result_image/lathist.eps',resolution=512,/transparent
@@ -125,8 +125,8 @@ pro source_region,lat,lon,png=png,ps=ps,bpath=bpath,epsilon=epsilon
     
     epsilon=acos(cos(lat*!dtor)*cos(lon*!dtor))/!dtor
     binsize3=10
-    epshist=histogram(epsilon,min=0,max=110,BINSIZE=binsize3,locations=binvals3)
-    histplot2=barplot(binvals3,epshist,ytitle='Num(#)',xtitle='$\epsilon(!Eo!N)$',position=[0.1,0.11,0.98,0.99],font_size=20,xrange=[-10,110])
+    epshist=histogram(epsilon,min=0,max=120,BINSIZE=binsize3,locations=binvals3)
+    histplot2=barplot(binvals3,epshist,ytitle='Num(#)',xtitle='$\epsilon(!Eo!N)$',position=[0.1,0.11,0.98,0.99],font_size=20,xrange=[0,115],/histogram)
     ;histplot2=plot(binvals3,omghist,/overplot)
     ;text3=text(binvals3,epshist+0.1,strmid(string(binvals3),5,6),/data,color='red',alignment=0.5)
     if keyword_set(ps) then histplot2.save,bpath+'result_image/epshist.eps',resolution=512,/transparent
@@ -134,8 +134,8 @@ pro source_region,lat,lon,png=png,ps=ps,bpath=bpath,epsilon=epsilon
     histplot2.close
 
     binsize4=20
-    lonhist=histogram(lon,min=-120,max=90,BINSIZE=binsize4,locations=binvals4)
-    histplot3=barplot(binvals4,lonhist,ytitle='Num(#)',xtitle='$\phi(!Eo!N)$',position=[0.1,0.11,0.98,0.99],font_size=20)
+    lonhist=histogram(lon,min=-110,max=90,BINSIZE=binsize4,locations=binvals4)
+    histplot3=barplot(binvals4,lonhist,ytitle='Num(#)',xtitle='$\phi(!Eo!N)$',position=[0.1,0.11,0.98,0.99],font_size=20,xrange=[-120,100],/histogram)
     if keyword_set(ps) then histplot3.save,bpath+'result_image/lonhist.eps',resolution=512,/transparent
     if keyword_set(png) then histplot3.save,bpath+'result_image/lonhist.png',resolution=512,/transparent
     histplot3.close
