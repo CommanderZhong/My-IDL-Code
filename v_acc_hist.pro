@@ -5,10 +5,10 @@ pro v_acc_hist,v,acc,lat,ps=ps,png=png,bpath=bpath
   binsize1=20
   vhist=histogram(v,min=0,BINSIZE=binsize,locations=binvals)
   acchist=histogram(acc*1000,min=-100,BINSIZE=binsize1,locations=binvals1)
-  histplot=barplot(binvals,vhist,position=[0.06,0.52,0.97,0.99],ytitle='Num(#)',/histogram)
+  histplot=barplot(binvals,vhist,position=[0.06,0.52,0.97,0.99],ytitle='No(#)',/histogram)
   text1=text(480,460,'V!IGCS!N(km.s!E-1!N )',color='Blue',FONT_SIZE=24,/device)
   ;histplot=plot(binvals,vhist,/overplot)
-  histplot=barplot(binvals1,acchist,/curr,position=[0.06,0.05,0.97,0.48],ytitle='Num(#)',/histogram)
+  histplot=barplot(binvals1,acchist,/curr,position=[0.06,0.05,0.97,0.48],ytitle='No(#)',/histogram)
   text2=text(480,220,'Acc(m.s!E-2!N )',color='Blue',FONT_SIZE=24,/device)
   ;histplot=plot(binvals1,acchist,/overplot)
   if keyword_set(ps) then histplot.save,bpath+'result_image/histogram.eps',resolution=512,/transparent

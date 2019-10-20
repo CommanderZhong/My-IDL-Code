@@ -5,7 +5,7 @@ pro v_others,start,arrive,v,han,ps=ps,png=png,bpath=bpath,epsilon=epsilon
    npoint=101l
    eps0=indgen(npoint)*120./(npoint-1)
    aneps=plot(epsilon,han,position=[0.12,0.11,0.97,0.99],yrange=[0,100],xtitle='$\epsilon $(!Eo!N)',ytitle='$\omega $(!Eo!N)',font_size=20)
-     aneps.symbol='D'
+   aneps.symbol='D'
    aneps.linestyle=''
    aneps.sym_color='r'
    aneps=plot(eps0,eps0,/curr,/overplot,'b.')

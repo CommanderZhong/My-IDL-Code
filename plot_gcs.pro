@@ -138,8 +138,11 @@ for i=0,n_elements(lon)-1 do begin
 endfor
 loc=where(lon gt 180)
 lon(loc)=lon(loc)-360
-;lat=[lat,para1.lat]
-;lon=[lon,para1.lon]
+
+;*******New Criterion*******
+new_criterion,lat,lon,han,rotat,rat,bpath=bpath
+;***************************
+
 loc=where(para1.v gt 0)
 lat=[lat,para1[loc].lat]
 lon=[lon,para1[loc].lon]
