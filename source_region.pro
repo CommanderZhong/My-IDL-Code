@@ -80,7 +80,7 @@ pro source_region,lat,lon,png=png,ps=ps,bpath=bpath,epsilon=epsilon
     my=replicate(1,n_elements(ly))
     for i=0l,n_elements(lat)-1 do begin
       if i eq 0l then begin
-        plot,lon,lat,/nodata,xrange=[-180,180],yrange=[-90,90],xstyle=1,ystyle=1,position=[0.10,0.1,0.99,0.34],xtitle='!4w!3(!Eo!N)',ytitle='!7h!3(!Eo!N)'
+        plot,lon,lat,/nodata,xrange=[-180,180],yrange=[-90,90],xstyle=1,ystyle=1,position=[0.10,0.1,0.99,0.34],xtitle='!4w!3 (!Eo!N)',ytitle='!7h!3 (!Eo!N)'
         plots,lon[i],lat[i],psym=4,color=fsc_color('blue'),symsize=1.8
       endif else begin
         plots,lon[i],lat[i],psym=4,color=fsc_color('blue'),symsize=1.8
@@ -116,9 +116,10 @@ pro source_region,lat,lon,png=png,ps=ps,bpath=bpath,epsilon=epsilon
     
     binsize2=10
     lathist=histogram(lat,Min=-45,Max=45,BINSIZE=binsize2,locations=binvals2)
-    histplot1=barplot(binvals2,lathist,ytitle='No(#)',xtitle='$\theta(!Eo!N)$',position=[0.1,0.11,0.98,0.99],font_size=20,xrange=[-40,50],/histogram)
+    histplot1=barplot(binvals2,lathist,ytitle='No (#)',xtitle='$\theta\ ( ^o)$',position=[0.1,0.11,0.98,0.99],font_size=20,xrange=[-40,50],/histogram)
     ;histplot1=plot(binvals2,lathist,/overplot)
     ;text3=text(binvals2,lathist+0.1,strmid(string(binvals2),5,7),/data,color='red',alignment=0.5)
+    text1=TEXT(-32,9.5,'(a)',/data,alignment=0.5,font_size=20)
     if keyword_set(ps) then histplot1.save,bpath+'result_image/lathist.eps',resolution=512,/transparent
     if keyword_set(png) then histplot1.save,bpath+'result_image/lathist.png',resolution=512,/transparent
     histplot1.close
@@ -126,7 +127,7 @@ pro source_region,lat,lon,png=png,ps=ps,bpath=bpath,epsilon=epsilon
     epsilon=acos(cos(lat*!dtor)*cos(lon*!dtor))/!dtor
     binsize3=10
     epshist=histogram(epsilon,min=0,max=120,BINSIZE=binsize3,locations=binvals3)
-    histplot2=barplot(binvals3,epshist,ytitle='No(#)',xtitle='$\epsilon(!Eo!N)$',position=[0.1,0.11,0.98,0.99],font_size=20,xrange=[0,115],/histogram)
+    histplot2=barplot(binvals3,epshist,ytitle='No (#)',xtitle='$\epsilon\ ( ^o)$',position=[0.1,0.11,0.98,0.99],font_size=20,xrange=[0,115],/histogram)
     ;histplot2=plot(binvals3,omghist,/overplot)
     ;text3=text(binvals3,epshist+0.1,strmid(string(binvals3),5,6),/data,color='red',alignment=0.5)
     if keyword_set(ps) then histplot2.save,bpath+'result_image/epshist.eps',resolution=512,/transparent
@@ -135,7 +136,8 @@ pro source_region,lat,lon,png=png,ps=ps,bpath=bpath,epsilon=epsilon
 
     binsize4=20
     lonhist=histogram(lon,min=-110,max=90,BINSIZE=binsize4,locations=binvals4)
-    histplot3=barplot(binvals4,lonhist,ytitle='No(#)',xtitle='$\phi(!Eo!N)$',position=[0.1,0.11,0.98,0.99],font_size=20,xrange=[-120,100],/histogram)
+    histplot3=barplot(binvals4,lonhist,ytitle='No (#)',xtitle='$\phi\ ( ^o)$',position=[0.1,0.11,0.98,0.99],font_size=20,xrange=[-120,100],/histogram)
+    text1=TEXT(-100,17,'(b)',/data,alignment=0.5,font_size=20)
     if keyword_set(ps) then histplot3.save,bpath+'result_image/lonhist.eps',resolution=512,/transparent
     if keyword_set(png) then histplot3.save,bpath+'result_image/lonhist.png',resolution=512,/transparent
     histplot3.close

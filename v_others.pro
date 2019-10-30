@@ -4,7 +4,7 @@ pro v_others,start,arrive,v,han,ps=ps,png=png,bpath=bpath,epsilon=epsilon
    
    npoint=101l
    eps0=indgen(npoint)*120./(npoint-1)
-   aneps=plot(epsilon,han,position=[0.12,0.11,0.97,0.99],yrange=[0,100],xtitle='$\epsilon $(!Eo!N)',ytitle='$\omega $(!Eo!N)',font_size=20)
+   aneps=plot(epsilon,han,position=[0.12,0.11,0.97,0.99],yrange=[0,100],xtitle='$\epsilon\ ( ^o)$',ytitle='$\omega\ ( ^o)$',font_size=20)
    aneps.symbol='D'
    aneps.linestyle=''
    aneps.sym_color='r'
@@ -35,7 +35,7 @@ pro v_others,start,arrive,v,han,ps=ps,png=png,bpath=bpath,epsilon=epsilon
   ;d_fit=coeff3[0]+coeff3[1]*vn
   if min(arrive2) gt 60.*60*24 then begin
     arrive2=arrive2/60./60./24
-    v_other=plot(v1,arrive2,POSITION=[0.11,0.11,0.97,0.99],xrange=[100,2200],xtitle='V!IGCS!N(km.s!E-1!N)',ytitle='T!Ipro!N(day)')
+    v_other=plot(v1,arrive2,POSITION=[0.11,0.11,0.97,0.99],xrange=[100,2200],xtitle='V!IGCS!N (km.s!E-1!N )',ytitle='T!Ipro!N (day)')
     v_other.SYMBOL='o'
     v_other.LINESTYLE=''
     v_other.SYM_COLOR='r'
@@ -56,7 +56,7 @@ pro v_others,start,arrive,v,han,ps=ps,png=png,bpath=bpath,epsilon=epsilon
     if keyword_set(png) then v_other.save,bpath+'result_image/v_others.png',resolution=512,/transparent
     v_other.close
   endif
-  v_han=plot(v1,han,/curr,POSITION=[0.12,0.11,0.97,0.99],xtitle='V!IGCS!N(km.s!E-1!N)',ytitle='$\omega $(!Eo!N)')
+  v_han=plot(v1,han,/curr,POSITION=[0.12,0.11,0.97,0.99],xtitle='V!IGCS!N (km.s!E-1!N )',ytitle='$\omega\ ( ^o)$')
   v_han.SYMBOL='x'
   v_han.LINESTYLE=''
   v_han.SYM_COLOR='r'
@@ -88,7 +88,7 @@ pro v_others,start,arrive,v,han,ps=ps,png=png,bpath=bpath,epsilon=epsilon
   dfit=coeff3[0]+coeff3[1]*vfit
   dfit1=coeff4[0]+coeff4[1]*tfit
   
-  dv=plot(v2,d_r,font_size=20,xrange=[0,2100],yrange=[0.8,2],xtitle='V!IGCS!N(km.s!E-1!N )',ytitle='D!Irl!N(AU)',position=[0.11,0.11,0.97,0.99])
+  dv=plot(v2,d_r,font_size=20,xrange=[0,2100],yrange=[0.8,2],xtitle='V!IGCS!N (km.s!E-1!N )',ytitle='D!Irl!N (AU)',position=[0.11,0.11,0.97,0.99])
   dv.symbol='o'
   dv.linestyle=''
   dv.sym_color='r'
@@ -98,7 +98,7 @@ pro v_others,start,arrive,v,han,ps=ps,png=png,bpath=bpath,epsilon=epsilon
   if keyword_set(png) then dv.save,bpath+'result_image/dv.png',resolution=512,/transparent
   dv.close
   
-tv=plot(tpr,d_r1,font_size=20,xrange=[0,max(tpr)+10],yrange=[0.8,2],xtitle='T!Ipr!N(hr)',ytitle='D!Irl!N(AU)',position=[0.11,0.11,0.97,0.99])
+tv=plot(tpr,d_r1,font_size=20,xrange=[0,max(tpr)+10],yrange=[0.8,2],xtitle='T!Ipr!N (hr)',ytitle='D!Irl!N (AU)',position=[0.11,0.11,0.97,0.99])
 tv.symbol='o'
 tv.linestyle=''
 tv.sym_color='r'
