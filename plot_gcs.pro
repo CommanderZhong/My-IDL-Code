@@ -80,6 +80,7 @@ endwhile
 free_lun,lun
 
 start=strarr(n_elements(date))  ;start time of observed CME
+h0=fltarr(n_elements(date))
 ;openw,lun1,bpath+'dd.txt',/get_lun
 for d=0,n_elements(date)-1 do begin
   path=findfile(bpath+'result/'+date[d]+'/*.txt')
@@ -105,8 +106,8 @@ for d=0,n_elements(date)-1 do begin
   Hight=para.HGT*Rsun
   start[d]=date1[0]+para[0].TIME
   
-  if keyword_set(ps) then hvt_plot,time,Hight,date1[0]+para[0].TIME,num,/ps,date=date[d],bpath=bpath,coeff=coeff,fit_result=fit_result
-  if keyword_set(png) then hvt_plot,time,Hight,date1[0]+para[0].TIME,num,/png,date=date[d],bpath=bpath,coeff=coeff,fit_result=fit_result
+  if keyword_set(ps) then hvt_plot,time,Hight,date1[0]+para[0].TIME,num,/ps,date=date[d],bpath=bpath,coeff=coeff,fit_result=fit_result,h0=h0[d]
+  if keyword_set(png) then hvt_plot,time,Hight,date1[0]+para[0].TIME,num,/png,date=date[d],bpath=bpath,coeff=coeff,fit_result=fit_result,h0=h0[d]
 
   lat=[lat,para[0].lat]
   lon=[lon,para[0].lon]
@@ -138,7 +139,7 @@ for i=0,n_elements(lon)-1 do begin
 endfor
 loc=where(lon gt 180)
 lon(loc)=lon(loc)-360
-
+;pmm,lon
 ;*******New Criterion*******
 new_criterion,lat,lon,han,rotat,rat,bpath=bpath
 ;***************************
@@ -181,14 +182,14 @@ free_lun,lun
 
   if keyword_set(ps) then begin
     if not keyword_set(nosr) then source_region,lat,lon,/ps,bpath=bpath,epsilon=epsilon
-    v_acc_hist,v,acc,lat,/ps,bpath=bpath
+    v_acc_hist,v,acc,h0,lat,/ps,bpath=bpath,tcal=tcal
     v_others,start,arrive,v,han,/ps,bpath=bpath,epsilon=epsilon
     loc=where(para2.vcdaw gt 0)
     vcdaw_others,v(loc),para2(loc).vcdaw,lat,lon,/ps,bpath=bpath
   endif
   if keyword_set(png) then begin
     if not keyword_set(nosr) then source_region,lat,lon,/png,bpath=bpath,epsilon=epsilon
-    v_acc_hist,v,acc,lat,/png,bpath=bpath
+    v_acc_hist,v,acc,h0,lat,/png,bpath=bpath,tcal=tcal
     v_others,start,arrive,v,han,/png,bpath=bpath,epsilon=epsilon
     loc=where(para2.vcdaw gt 0)
     vcdaw_others,v(loc),para2(loc).vcdaw,lat(loc),lon(loc),/png,bpath=bpath
