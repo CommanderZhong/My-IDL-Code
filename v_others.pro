@@ -4,7 +4,7 @@ pro v_others,start,arrive,v,han,ps=ps,png=png,bpath=bpath,epsilon=epsilon
    
    npoint=101l
    eps0=indgen(npoint)*120./(npoint-1)
-   aneps=plot(epsilon,han,position=[0.12,0.11,0.97,0.99],yrange=[0,100],xtitle='$\epsilon\ ( ^o)$',ytitle='$\omega\ ( ^o)$',font_size=20)
+   aneps=PLOT(epsilon,han,position=[0.12,0.11,0.97,0.99],yrange=[0,100],xtitle='$\epsilon\ ( ^o)$',ytitle='$\omega\ ( ^o)$',font_size=20)
    aneps.symbol='D'
    aneps.linestyle=''
    aneps.sym_color='r'
@@ -14,7 +14,7 @@ pro v_others,start,arrive,v,han,ps=ps,png=png,bpath=bpath,epsilon=epsilon
    if keyword_set(png) then aneps.save,bpath+'result_image/aneps.png',resolution=512,/transparent
    aneps.close
   ; velocity & arrive time/Half angle profile
-  loc=where(arrive ne '-------------------')
+  loc=where(arrive ne '-------------------') ;arrive[13]=---------
   arrive1=arrive(loc)
   start1=start(loc)
   v1=v(loc)
@@ -56,7 +56,8 @@ pro v_others,start,arrive,v,han,ps=ps,png=png,bpath=bpath,epsilon=epsilon
     if keyword_set(png) then v_other.save,bpath+'result_image/v_others.png',resolution=512,/transparent
     v_other.close
   endif
-  v_han=plot(v1,han,/curr,POSITION=[0.12,0.11,0.97,0.99],xtitle='V!IGCS!N (km.s!E-1!N )',ytitle='$\omega\ ( ^o)$')
+  hanerr=REPLICATE(5,N_ELEMENTS(han))
+  v_han=ERRORPLOT(v1,han,hanerr,/curr,POSITION=[0.12,0.11,0.97,0.99],xtitle='V!IGCS!N (km.s!E-1!N )',ytitle='$\omega\ ( ^o)$')
   v_han.SYMBOL='x'
   v_han.LINESTYLE=''
   v_han.SYM_COLOR='r'
@@ -75,7 +76,6 @@ pro v_others,start,arrive,v,han,ps=ps,png=png,bpath=bpath,epsilon=epsilon
   tpr=arrive2(loc)*24
   v2=v1(loc)
   d_r=solve_equation(eps1,han1)
-
   coeff3=linfit(v2,d_r)
   cc2=correlate(v2,d_r)
   loc1=where((v2 gt 400) and (v2 lt 600))

@@ -1,4 +1,12 @@
-pro v_acc_hist,v,acc,lat,ps=ps,png=png,bpath=bpath
+FUNCTION calculate_t,v0,h0,k,vsw,drl
+;+
+;To solve equation drl-h0-v0/k=vsw*t-v0/k*exp(-k*t)
+;-
+
+  t=fltarr(1)
+  RETURN,t
+END
+pro v_acc_hist,v,acc,h0,lat,ps=ps,png=png,bpath=bpath,tcal=tcal
 
 ;plots histogram
   binsize=200
@@ -19,10 +27,6 @@ pro v_acc_hist,v,acc,lat,ps=ps,png=png,bpath=bpath
   acc_v.LINESTYLE=''
   acc_v.SYM_COLOR='r'
   acc_v.SYM_SIZE=1.5
-  
-;  acc_v=plot(replicate(300,51),indgen(51)*2,/curr,/overplot,'b.')
-;  text3=text(120,320,'B',color='Blue',FONT_SIZE=24,/device)
-;  text4=text(480,180,'A',color='Blue',FONT_SIZE=24,/device)
 
 ;------------------Linfit------------------------------
   coeff=linfit(v[0:46],acc*1000)
@@ -34,8 +38,19 @@ pro v_acc_hist,v,acc,lat,ps=ps,png=png,bpath=bpath
   acc_v=plot(indgen(51)*1400./50,replicate(0,51),/curr,/overplot,'b.')
   acc_v=plot(replicate(vfit0,51),indgen(51)*4-100,/curr,/overplot,'b.')
   text5=text(1200,80,'CC='+strmid(string(cc),5,6),color='green',/data,font_size=20,alignment=0.5)
+  text5=text(100,80,'(c)',font_size=20,/data)
 ;-------------------------------------------------------
 
+;--------------V-A model----------------------------
+  au=149597871l
+  Rs=696300l  ;solar radii
+  vsw=363.73  ;solar wind speed
+  tcal=FLTARR(N_ELEMENTS(acc))
+  v0=v[0:46]-vsw
+  k=coeff[1]
+  drl=au
+  tcal=calculate_t(v0,h0,k,vsw,drl)
+;---------------------------------------------------
 
   if keyword_set(ps) then acc_v.save,bpath+'result_image/acc.eps',resolution=512,/transparent
   if keyword_set(png) then acc_v.save,bpath+'result_image/acc.png',resolution=512,/transparent

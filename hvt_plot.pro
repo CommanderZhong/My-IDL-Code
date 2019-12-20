@@ -1,5 +1,7 @@
-pro hvt_plot,time,Hight,head,num,ps=ps,png=png,bpath=bpath,degree=degree,date=date,coeff=coeff,fit_result=fit_result
+pro hvt_plot,time,Hight,head,num,ps=ps,png=png,bpath=bpath,degree=degree,date=date,coeff=coeff,fit_result=fit_result,$
+                  h0=h0
 
+  h0=0.5*(Hight[0]+Hight[-1])
   ;linfit
   coeff=linfit(time,Hight)
 

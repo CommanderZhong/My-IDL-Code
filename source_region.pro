@@ -66,13 +66,13 @@ pro source_region,lat,lon,png=png,ps=ps,bpath=bpath,epsilon=epsilon
     plots,1400,130,color=fsc_color('red'),psym=4,symsize=1.8
     loadct,0l
     xyouts,2048,3800,'Solar Disk',ALIGNMENT=0.5,charsize=1.8
-    xyouts,2048,250,'->Front of The Solar Disk',ALIGNMENT=0.5
-    xyouts,2048,100,'->Back of The Solar Disk',ALIGNMENT=0.5
+    xyouts,2048,250,'->Front of The Solar Disk',ALIGNMENT=0.5,charsize=1
+    xyouts,2048,100,'->Back of The Solar Disk',ALIGNMENT=0.5,charsize=1
     ;xyouts,2040,2040,'0!Eo!N',ALIGNMENT=0.5,charsize=1.2,charthick=1.5,color=fsc_color('red')
     loadct,0l
     
     !p.charsize=1.5
-    maxlat=max(lat)
+    maxlat=max(lat) ;& print,n_elements(where((lon lt 40) and (lon gt -40))),n_elements(where(lon gt 0))
     minlat=min(lat)
     lx=indgen(361)-180
     ly=indgen(181)-90
