@@ -1,12 +1,4 @@
-FUNCTION calculate_t,v0,h0,k,vsw,drl
-;+
-;To solve equation drl-h0-v0/k=vsw*t-v0/k*exp(-k*t)
-;-
-
-  t=fltarr(1)
-  RETURN,t
-END
-pro v_acc_hist,v,acc,h0,lat,ps=ps,png=png,bpath=bpath,tcal=tcal
+pro v_acc_hist,v,acc,lat,ps=ps,bpath=bpath,k=k
 
 ;plots histogram
   binsize=200
@@ -20,7 +12,6 @@ pro v_acc_hist,v,acc,h0,lat,ps=ps,png=png,bpath=bpath,tcal=tcal
   text2=text(65,200,'(b)',FONT_SIZE=20,/device)
   ;histplot=plot(binvals1,acchist,/overplot)
   if keyword_set(ps) then histplot.save,bpath+'result_image/histogram.eps',resolution=512,/transparent
-  if keyword_set(png) then histplot.save,bpath+'result_image/histogram.png',resolution=512,/transparent
   histplot.close
   acc_v=plot(v[0:46],acc*1000,ytitle='$a_{GCS}\ (m.s^{-2})$',xtitle='$V_{GCS}\ (km.s^{-1})$',position=[0.14,0.13,0.97,0.99],font_size=20)
   acc_v.symbol='d'
@@ -41,18 +32,9 @@ pro v_acc_hist,v,acc,h0,lat,ps=ps,png=png,bpath=bpath,tcal=tcal
   text5=text(100,80,'(c)',font_size=20,/data)
 ;-------------------------------------------------------
 
-;--------------V-A model----------------------------
-  au=149597871l
-  Rs=696300l  ;solar radii
-  vsw=363.73  ;solar wind speed
-  tcal=FLTARR(N_ELEMENTS(acc))
-  v0=v[0:46]-vsw
-  k=coeff[1]
-  drl=au
-  tcal=calculate_t(v0,h0,k,vsw,drl)
-;---------------------------------------------------
 
   if keyword_set(ps) then acc_v.save,bpath+'result_image/acc.eps',resolution=512,/transparent
-  if keyword_set(png) then acc_v.save,bpath+'result_image/acc.png',resolution=512,/transparent
   acc_v.close
+  
+  k=double(-coeff[1]*1e3)
 end

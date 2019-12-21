@@ -1,5 +1,14 @@
-pro v_others,start,arrive,v,han,ps=ps,png=png,bpath=bpath,epsilon=epsilon
+FUNCTION calculate_t,tcal0
+  ;+
+  ;To equation drl-h0-v0/k=vsw*t-v0/k*exp(-k*t)
+  ;-
+  common var,h1,k0,v0,vsw,drl
 
+  RETURN,vsw*tcal0-v0/k0*exp(-k0*tcal0)-drl+h1+v0/k0
+END
+pro v_others,start,arrive,v,acc,han,h0,ps=ps,png=png,bpath=bpath,epsilon=epsilon,k=k
+common var,h1,k0,v0,vsw,drl
+   k0=k
    au=149597871l
    
    npoint=101l
@@ -107,4 +116,22 @@ text1=text(0.2,0.9,'CC='+strmid(string(cc3),6,5),/normal,font_size=20,color='blu
 if keyword_set(ps) then tv.save,bpath+'result_image/tv.eps',resolution=512,/transparent
 if keyword_set(png) then tv.save,bpath+'result_image/tv.png',resolution=512,/transparent
 tv.close
+
+;--------------V-A model----------------------------
+vsw=363.73d  ;solar wind speed
+tcal=make_array(N_ELEMENTS(d_r),/double)
+drl=d_r*au
+tcal0=tcal
+tcal0[*]=24*3600l*3
+v0=double(v1[0:N_ELEMENTS(d_r)-1]-vsw)
+h0=[h0[0:12],h0[14:-1]]
+h1=double(h0[0:N_ELEMENTS(d_r)-1])
+tcal=NEWTON(tcal0,'calculate_t',/double)
+tt=plot(tcal/24/3600,arrive2[0:N_ELEMENTS(d_r)-1],xtitle='T$_{cal}$ (day)',ytitle='T$_{pro}$ (day)',font_size=18)
+tt.symbol='o'
+tt.linestyle=''
+tt.sym_color='r'
+tt=plot(indgen(10)/9*3+4,indgen(10)/9*3+4,/overplot,'b--')
+stop
+;---------------------------------------------------
 end
