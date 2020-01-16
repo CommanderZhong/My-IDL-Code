@@ -18,7 +18,7 @@
 ; v1.3  add lin-fit                Z.H.Zhong at 04/30/2019
 ;-
 
-pro plot_gcs,date=date,nosr=nosr,png=png,ps=ps,degree=degree,$
+pro plot_gcs,date=date,nosr=nosr,degree=degree,$
              nolist=nolist          
 
 bpath='/home/zhzhong/Desktop/mywork/work/'
@@ -80,7 +80,7 @@ endwhile
 free_lun,lun
 
 start=strarr(n_elements(date))  ;start time of observed CME
-h0=fltarr(n_elements(date))
+haver=[]
 ;openw,lun1,bpath+'dd.txt',/get_lun
 for d=0,n_elements(date)-1 do begin
   path=findfile(bpath+'result/'+date[d]+'/*.txt')
@@ -106,9 +106,9 @@ for d=0,n_elements(date)-1 do begin
   Hight=para.HGT*Rsun
   start[d]=date1[0]+para[0].TIME
   
-  if keyword_set(ps) then hvt_plot,time,Hight,date1[0]+para[0].TIME,num,/ps,date=date[d],bpath=bpath,coeff=coeff,fit_result=fit_result,h0=h0[d]
-  if keyword_set(png) then hvt_plot,time,Hight,date1[0]+para[0].TIME,num,/png,date=date[d],bpath=bpath,coeff=coeff,fit_result=fit_result,h0=h0[d]
+  hvt_plot,time,Hight,date1[0]+para[0].TIME,num,/ps,date=date[d],bpath=bpath,coeff=coeff,fit_result=fit_result,h0=h0
 
+  haver=[haver,h0]
   lat=[lat,para[0].lat]
   lon=[lon,para[0].lon]
   v=[v,coeff[1]]
@@ -170,9 +170,17 @@ free_lun,lun
 openw,lun,bpath+'table.txt',/get_lun
 record=n_elements(v)
 for i=0,record-1 do begin
-  printf,lun,start[i],lon[i],lat[i],rotat[i],han[i],v[i],para2[i].vcdaw
+  printf,lun,start[i],lon[i],lat[i],rotat[i],han[i],v[i]
 endfor
 free_lun,lun
+
+openw,lun,bpath+'ratio.txt',/get_lun
+record=n_elements(rat)
+for i=0,record-1 do begin
+  printf,lun,start[i],rat[i]
+endfor
+free_lun,lun
+
 openw,lun,bpath+'acc.txt',/get_lun
 record1=n_elements(acc)
 for i=0,record1-1 do begin
@@ -180,19 +188,11 @@ for i=0,record1-1 do begin
 endfor
 free_lun,lun
 
-  if keyword_set(ps) then begin
     if not keyword_set(nosr) then source_region,lat,lon,/ps,bpath=bpath,epsilon=epsilon
-    v_acc_hist,v,acc,h0,lat,/ps,bpath=bpath,tcal=tcal
-    v_others,start,arrive,v,han,/ps,bpath=bpath,epsilon=epsilon
-    loc=where(para2.vcdaw gt 0)
-    vcdaw_others,v(loc),para2(loc).vcdaw,lat,lon,/ps,bpath=bpath
-  endif
-  if keyword_set(png) then begin
-    if not keyword_set(nosr) then source_region,lat,lon,/png,bpath=bpath,epsilon=epsilon
-    v_acc_hist,v,acc,h0,lat,/png,bpath=bpath,tcal=tcal
-    v_others,start,arrive,v,han,/png,bpath=bpath,epsilon=epsilon
-    loc=where(para2.vcdaw gt 0)
-    vcdaw_others,v(loc),para2(loc).vcdaw,lat(loc),lon(loc),/png,bpath=bpath
-  endif
-vvv
+    v_acc_hist,v,acc,lat,/ps,bpath=bpath,k=k
+    v_others,start,arrive,v,acc,han,haver,/ps,bpath=bpath,epsilon=epsilon,k=k
+    ;loc=where(para2.vcdaw gt 0)
+    ;vcdaw_others,v(loc),para2(loc).vcdaw,lat,lon,/ps,bpath=bpath
+;vvv
+  v_posi,v,lat,lon,bpath=bpath
 end

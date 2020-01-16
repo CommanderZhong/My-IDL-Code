@@ -1,12 +1,4 @@
-FUNCTION calculate_t,v0,h0,k,vsw,drl
-;+
-;To solve equation drl-h0-v0/k=vsw*t-v0/k*exp(-k*t)
-;-
-
-  t=fltarr(1)
-  RETURN,t
-END
-pro v_acc_hist,v,acc,h0,lat,ps=ps,png=png,bpath=bpath,tcal=tcal
+pro v_acc_hist,v,acc,lat,ps=ps,bpath=bpath,k=k
 
 ;plots histogram
   binsize=200
@@ -20,20 +12,19 @@ pro v_acc_hist,v,acc,h0,lat,ps=ps,png=png,bpath=bpath,tcal=tcal
   text2=text(65,200,'(b)',FONT_SIZE=20,/device)
   ;histplot=plot(binvals1,acchist,/overplot)
   if keyword_set(ps) then histplot.save,bpath+'result_image/histogram.eps',resolution=512,/transparent
-  if keyword_set(png) then histplot.save,bpath+'result_image/histogram.png',resolution=512,/transparent
   histplot.close
   acc_v=plot(v[0:46],acc*1000,ytitle='$a_{GCS}\ (m.s^{-2})$',xtitle='$V_{GCS}\ (km.s^{-1})$',position=[0.14,0.13,0.97,0.99],font_size=20)
   acc_v.symbol='d'
   acc_v.LINESTYLE=''
   acc_v.SYM_COLOR='r'
   acc_v.SYM_SIZE=1.5
-
+;print,average(v),average(acc*1000),n_elements(where(acc*1000 lt -20)),n_elements(where(acc*1000 gt 20))
 ;------------------Linfit------------------------------
-  coeff=linfit(v[0:46],acc*1000)
-  cc=correlate(v[0:46],acc*1000)
+  coeff=linfit(v[0:45],acc*1000)
+  cc=correlate(v[0:45],acc*1000)
   vafit=indgen(1001)/1000.*1500
-  afit=coeff[0]+coeff[1]*vafit
-  vfit0=-coeff[0]/coeff[1]
+  afit=coeff[0]+coeff[1]*vafit 
+  vfit0=-coeff[0]/coeff[1] ;& print,vfit0
   acc_v=plot(vafit,afit,/curr,/overplot,'g--')
   acc_v=plot(indgen(51)*1400./50,replicate(0,51),/curr,/overplot,'b.')
   acc_v=plot(replicate(vfit0,51),indgen(51)*4-100,/curr,/overplot,'b.')
@@ -41,18 +32,9 @@ pro v_acc_hist,v,acc,h0,lat,ps=ps,png=png,bpath=bpath,tcal=tcal
   text5=text(100,80,'(c)',font_size=20,/data)
 ;-------------------------------------------------------
 
-;--------------V-A model----------------------------
-  au=149597871l
-  Rs=696300l  ;solar radii
-  vsw=363.73  ;solar wind speed
-  tcal=FLTARR(N_ELEMENTS(acc))
-  v0=v[0:46]-vsw
-  k=coeff[1]
-  drl=au
-  tcal=calculate_t(v0,h0,k,vsw,drl)
-;---------------------------------------------------
 
   if keyword_set(ps) then acc_v.save,bpath+'result_image/acc.eps',resolution=512,/transparent
-  if keyword_set(png) then acc_v.save,bpath+'result_image/acc.png',resolution=512,/transparent
   acc_v.close
+  
+  k=double(-coeff[1]*1e3)
 end
