@@ -8,8 +8,8 @@ pro sav_read1,date=date,nolasco=nolasco,path=path
   ;;       sav_read,date='120623',/nolasco
   ;-
   if not keyword_set(nolasco) then nolasco=2
-  if not keyword_set(date) then date='121005'
-  if not keyword_set(path) then path='/home/zhzhong/Desktop/mywork/work/result/121005/'
+  if not keyword_set(date) then date='120902'
+  if not keyword_set(path) then path='/home/zhzhong/Desktop/mywork/work/result/120902_2/'
 
   file=findfile(path+date+'savdata*.sav')
   ;There are 6 kinds of parameters in total

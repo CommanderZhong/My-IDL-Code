@@ -170,9 +170,17 @@ free_lun,lun
 openw,lun,bpath+'table.txt',/get_lun
 record=n_elements(v)
 for i=0,record-1 do begin
-  printf,lun,start[i],lon[i],lat[i],rotat[i],han[i],v[i],para2[i].vcdaw
+  printf,lun,start[i],lon[i],lat[i],rotat[i],han[i],v[i]
 endfor
 free_lun,lun
+
+openw,lun,bpath+'ratio.txt',/get_lun
+record=n_elements(rat)
+for i=0,record-1 do begin
+  printf,lun,start[i],rat[i]
+endfor
+free_lun,lun
+
 openw,lun,bpath+'acc.txt',/get_lun
 record1=n_elements(acc)
 for i=0,record1-1 do begin
@@ -183,7 +191,8 @@ free_lun,lun
     if not keyword_set(nosr) then source_region,lat,lon,/ps,bpath=bpath,epsilon=epsilon
     v_acc_hist,v,acc,lat,/ps,bpath=bpath,k=k
     v_others,start,arrive,v,acc,han,haver,/ps,bpath=bpath,epsilon=epsilon,k=k
-    loc=where(para2.vcdaw gt 0)
-    vcdaw_others,v(loc),para2(loc).vcdaw,lat,lon,/ps,bpath=bpath
-vvv
+    ;loc=where(para2.vcdaw gt 0)
+    ;vcdaw_others,v(loc),para2(loc).vcdaw,lat,lon,/ps,bpath=bpath
+;vvv
+  v_posi,v,lat,lon,bpath=bpath
 end

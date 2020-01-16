@@ -129,7 +129,7 @@ pro source_region,lat,lon,png=png,ps=ps,bpath=bpath,epsilon=epsilon
     epshist=histogram(epsilon,min=0,max=120,BINSIZE=binsize3,locations=binvals3)
     histplot2=barplot(binvals3,epshist,ytitle='No (#)',xtitle='$\epsilon\ ( ^o)$',position=[0.1,0.11,0.98,0.99],font_size=20,xrange=[0,115],/histogram)
     ;histplot2=plot(binvals3,omghist,/overplot)
-    ;text3=text(binvals3,epshist+0.1,strmid(string(binvals3),5,6),/data,color='red',alignment=0.5)
+    text3=text(100,15,'(b)',/data,color='black',alignment=0.5,FONT_SIZE=20)
     if keyword_set(ps) then histplot2.save,bpath+'result_image/epshist.eps',resolution=512,/transparent
     if keyword_set(png) then histplot2.save,bpath+'result_image/epshist.png',resolution=512,/transparent
     histplot2.close

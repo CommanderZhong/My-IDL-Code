@@ -19,16 +19,15 @@ common var,h1,k0,v0,vsw,drl
    aneps.sym_color='r'
    aneps=plot(eps0,eps0,/curr,/overplot,'b.')
    text0=text(80,72,'$\omega=\epsilon$',/data,color='blue',alignment=0.5,font_size=20)
+   text00=text(110,90,'(c)',/data,color='black',alignment=0.5,font_size=20) ;& print,n_elements(where(han ge epsilon)),n_elements(han)
    if keyword_set(ps) then aneps.save,bpath+'result_image/aneps.eps',resolution=512,/transparent
    if keyword_set(png) then aneps.save,bpath+'result_image/aneps.png',resolution=512,/transparent
    aneps.close
   ; velocity & arrive time/Half angle profile
-  loc=where(arrive ne '-------------------') ;arrive[13]=---------
-  arrive1=arrive(loc)
-  start1=start(loc)
-  v1=v(loc)
-  epsilon=epsilon(loc)
-  han=han(loc)
+
+  arrive1=arrive
+  start1=start
+  v1=v
   
   coeff1=linfit(v1,han)
   cc=correlate(v1,han)
@@ -40,9 +39,7 @@ common var,h1,k0,v0,vsw,drl
   arrive1=strmid(arrive1,0,4)+'/'+strmid(arrive1,5,2)+'/'+strmid(arrive1,8,2)+' '+strmid(arrive1,11,8)
   arrive2=anytim2tai(arrive1)-anytim2tai(start1)
   
-  
-  ;d_fit=coeff3[0]+coeff3[1]*vn
-  if min(arrive2) gt 60.*60*24 then begin
+  if min(arrive2) gt 60.*60*24l then begin
     arrive2=arrive2/60./60./24
     v_other=plot(v1,arrive2,POSITION=[0.11,0.11,0.97,0.99],xrange=[100,2200],xtitle='V!IGCS!N (km.s!E-1!N )',ytitle='T!Ipro!N (day)')
     v_other.SYMBOL='o'
@@ -76,8 +73,6 @@ common var,h1,k0,v0,vsw,drl
   if keyword_set(ps) then v_han.save,bpath+'result_image/v_han.eps',resolution=512,/transparent
   if keyword_set(png) then v_han.save,bpath+'result_image/v_han.png',resolution=512,/transparent
   v_han.close
-  
-  
   
   loc=where(epsilon le han)
   eps1=epsilon(loc)*!dtor
@@ -116,7 +111,7 @@ text1=text(0.2,0.9,'CC='+strmid(string(cc3),6,5),/normal,font_size=20,color='blu
 if keyword_set(ps) then tv.save,bpath+'result_image/tv.eps',resolution=512,/transparent
 if keyword_set(png) then tv.save,bpath+'result_image/tv.png',resolution=512,/transparent
 tv.close
-
+ 
 ;--------------V-A model----------------------------
 vsw=363.73d  ;solar wind speed
 tcal=make_array(N_ELEMENTS(d_r),/double)
@@ -132,6 +127,8 @@ tt.symbol='o'
 tt.linestyle=''
 tt.sym_color='r'
 tt=plot(indgen(10)/9*3+4,indgen(10)/9*3+4,/overplot,'b--')
-stop
+tt.save,bpath+'result_image/tt.eps',resolution=512,/transparent
+tt.save,bpath+'result_image/tt.pdf',resolution=512,/transparent
+tt.close
 ;---------------------------------------------------
 end

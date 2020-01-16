@@ -18,13 +18,13 @@ pro v_acc_hist,v,acc,lat,ps=ps,bpath=bpath,k=k
   acc_v.LINESTYLE=''
   acc_v.SYM_COLOR='r'
   acc_v.SYM_SIZE=1.5
-
+;print,average(v),average(acc*1000),n_elements(where(acc*1000 lt -20)),n_elements(where(acc*1000 gt 20))
 ;------------------Linfit------------------------------
-  coeff=linfit(v[0:46],acc*1000)
-  cc=correlate(v[0:46],acc*1000)
+  coeff=linfit(v[0:45],acc*1000)
+  cc=correlate(v[0:45],acc*1000)
   vafit=indgen(1001)/1000.*1500
-  afit=coeff[0]+coeff[1]*vafit
-  vfit0=-coeff[0]/coeff[1]
+  afit=coeff[0]+coeff[1]*vafit 
+  vfit0=-coeff[0]/coeff[1] ;& print,vfit0
   acc_v=plot(vafit,afit,/curr,/overplot,'g--')
   acc_v=plot(indgen(51)*1400./50,replicate(0,51),/curr,/overplot,'b.')
   acc_v=plot(replicate(vfit0,51),indgen(51)*4-100,/curr,/overplot,'b.')
